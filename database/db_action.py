@@ -88,6 +88,18 @@ class Database:
                                        )
                                    """)
 
+
+            await self.execute_query("""
+                                       CREATE TABLE IF NOT EXISTS reviews (
+                                           g_id BIGINT,
+                                           rev_id BIGINT,
+                                           from_username TEXT,
+                                           date TEXT, 
+                                           rev_text TEXT
+                                       )
+                                    """)
+
+
             logger.info('connected to database')
 
         except (Exception, asyncpg.PostgresError) as error:

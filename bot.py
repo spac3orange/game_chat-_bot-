@@ -5,7 +5,7 @@ from config import aiogram_bot
 from config.logger import logger
 from keyboards import set_commands_menu
 from database import db
-from handlers import start, game_menu, unknown_command, user_lk, pop_up_commands, search_engine
+from handlers import start, game_menu, unknown_command, user_lk, pop_up_commands, search_engine, reviews
 from handlers.admin_panel import edit_descriptions, panel_menu
 from handlers.payment import ukassa, promo_code
 from middlewares import CheckSubMiddleware
@@ -22,6 +22,7 @@ async def start_params() -> None:
     dp.include_router(ukassa.router)
     dp.include_router(promo_code.router)
     dp.include_router(search_engine.router)
+    dp.include_router(reviews.router)
     dp.include_router(unknown_command.router)
 
     dp.message.middleware(CheckSubMiddleware())

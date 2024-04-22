@@ -66,6 +66,7 @@ def sub_menu():
 def bg_menu(g_id):
     kb_builder = InlineKeyboardBuilder()
     kb_builder.button(text='Оплатить', callback_data=f'bg_buy_{g_id}')
+    kb_builder.button(text='Отзывы', callback_data=f'revs_{g_id}')
 
     kb_builder.adjust(1)
     return kb_builder.as_markup(resize_keyboard=True)
