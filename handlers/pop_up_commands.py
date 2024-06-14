@@ -11,4 +11,4 @@ router = Router()
 
 @router.message(Command('support'))
 async def p_support(message: Message):
-    await message.answer('Тех. Поддержка: @None')
+    await message.answer('Тех. Поддержка: @stepusiks')

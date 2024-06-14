@@ -26,6 +26,7 @@ async def check_code_in_users(uid, code):
     else:
         return True
 
+
 async def p_lk(message: Message):
     uid = message.from_user.id
     user_balance = await db.get_user_balance(uid)
@@ -37,8 +38,15 @@ async def p_lk(message: Message):
 @router.callback_query(F.data == 'input_promo')
 async def p_input_promo(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
-    await callback.message.answer('Введите промо-код: ')
+    await callback.message.answer('Введите промо-код: ', reply_markup=main_kb.del_last_promo())
     await state.set_state(Promo.input_code)
+
+
+@router.callback_query(F.data == 'del_last_promo')
+async def del_l_promo(call: CallbackQuery, state: FSMContext):
+    await call.answer()
+    await state.clear()
+    await call.message.delete()
 
 
 @router.message(Promo.input_code, lambda message: message.text.isdigit())

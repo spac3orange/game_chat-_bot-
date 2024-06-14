@@ -3,6 +3,7 @@ from environs import Env
 from config import logger
 from typing import List, Dict, Tuple
 import asyncio
+from datetime import datetime
 
 
 class Database:
@@ -89,21 +90,74 @@ class Database:
                                    """)
 
 
+
             await self.execute_query("""
                                        CREATE TABLE IF NOT EXISTS reviews (
                                            g_id BIGINT,
-                                           rev_id BIGINT,
+                                           rev_id BIGINT PRIMARY KEY,
                                            from_username TEXT,
                                            date TEXT, 
                                            rev_text TEXT
                                        )
                                     """)
 
+            await self.execute_query("""
+                                        CREATE TABLE IF NOT EXISTS user_states (
+                                            user_id BIGINT PRIMARY KEY,
+                                            state VARCHAR(255),
+                                            last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                                        );
+            """)
 
             logger.info('connected to database')
 
         except (Exception, asyncpg.PostgresError) as error:
             logger.error("Error while connecting to DB", error)
+
+    async def set_user_state(self, user_id, state):
+        user_id = int(user_id)
+        query = """
+        INSERT INTO user_states (user_id, state) VALUES ($1, $2)
+        ON CONFLICT (user_id) DO UPDATE SET state = EXCLUDED.state, last_update = CURRENT_TIMESTAMP;
+        """
+        await self.execute_query(query, user_id, state)
+        logger.info(f'State updated for user {user_id} to {state}')
+
+    async def check_user_state(self, user_id, state_to_check):
+        current_state = await self.get_user_state(user_id)
+        print(current_state)
+        return current_state == state_to_check
+
+    async def get_user_state(self, user_id):
+        query = """
+        SELECT state FROM user_states WHERE user_id = $1;
+        """
+        result = await self.fetch_row(query, int(user_id))
+        if result:
+            return result['state']
+        return None
+
+    async def get_reviews_for_g_id(self, g_id: int) -> List[Dict[str, str]]:
+        try:
+            query = """
+                SELECT rev_id, from_username, date, rev_text
+                FROM reviews
+                WHERE g_id = $1
+            """
+            reviews = await self.fetch_all(query, g_id)
+            return [
+                {
+                    'rev_id': str(review['rev_id']),
+                    'from_username': review['from_username'],
+                    'date': review['date'],
+                    'rev_text': review['rev_text']
+                }
+                for review in reviews
+            ]
+        except Exception as error:
+            print("Error while fetching reviews for g_id:", error)
+            return []
+
 
     async def write_bot_settings(self, user_id: int, photo_path: str, main_text: str, game_search_text: str) -> None:
         try:
@@ -207,6 +261,16 @@ class Database:
             logger.error("Error while getting girls by game:", error)
             return []
 
+    async def get_all_girls(self):
+        try:
+            query = """
+                SELECT * FROM girls
+            """
+            return await self.fetch_all(query)
+        except (Exception, asyncpg.PostgresError) as error:
+            logger.error("Error while getting girls:", error)
+            return []
+
     async def get_girls_by_id(self, g_id: int):
         try:
             query = """
@@ -274,6 +338,48 @@ class Database:
             logger.info(f"Added new promo code {new_code} for user {user_id}. Updated promo codes: {new_codes}")
         except (Exception, asyncpg.PostgresError) as error:
             logger.error(f"Error while adding promo code {new_code} for user {user_id}", error)
+
+    async def add_review(self, g_id: int, rev_id: int, from_username: str, rev_text: str) -> None:
+        """
+        Adds a review to the reviews table with the current date.
+
+        :param g_id: The group ID associated with the review.
+        :param rev_id: The unique review ID.
+        :param from_username: The username of the reviewer.
+        :param rev_text: The text of the review.
+        """
+        try:
+            # Get the current date in the dd/mm/yy format
+            current_date = datetime.now().strftime("%d/%m/%y")
+
+            query = """
+                INSERT INTO reviews (g_id, rev_id, from_username, date, rev_text)
+                VALUES ($1, $2, $3, $4, $5)
+            """
+            await self.execute_query(query, g_id, rev_id, from_username, current_date, rev_text)
+            logger.info("Review added successfully with current date")
+        except (Exception, asyncpg.PostgresError) as error:
+            logger.error("Error while adding review to DB", error)
+
+    async def delete_review(self, review_id: int) -> None:
+        query = "DELETE FROM reviews WHERE rev_id = $1;"
+        try:
+            await self.execute_query(query, review_id)
+            logger.info(f"Review deleted. Id:{review_id}.")
+        except Exception as e:
+            logger.error(f"Error while deleting review {e}")
+
+    async def get_shift_status(self, user_id):
+        try:
+            result = await self.fetch_row(
+                "SELECT * FROM girl_shift WHERE user_id = $1", user_id)
+            if result:
+                return result
+            else:
+                return "User not found"
+        except (Exception, asyncpg.PostgresError) as error:
+            logger.error("Error retrieving shift status", error)
+            return str(error)
 
 
 db = Database()

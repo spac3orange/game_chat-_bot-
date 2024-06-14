@@ -19,3 +19,5 @@ async def p_user_lk(callback: CallbackQuery):
     user_info = (f'<b>Ваш ID</b>: {uid}'
                  f'\n<b>Баланс:</b> {user_balance} рублей')
     await callback.message.edit_text(user_info, reply_markup=main_kb.lk_menu())
+
+

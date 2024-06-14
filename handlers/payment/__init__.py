@@ -1,1 +1,1 @@
-from . import ukassa, promo_code
+from . import ukassa, promo_code, tinkoff

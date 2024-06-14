@@ -30,3 +30,13 @@ class EnterPromo(StatesGroup):
 class BuyGirl(StatesGroup):
     input_hours = State()
     process_req = State()
+
+
+class ProcRev(StatesGroup):
+    input_rev = State()
+
+
+class ChatConnect(StatesGroup):
+    create_req = State()
+    waiting_for_user2_approval = State()
+    chatting = State()

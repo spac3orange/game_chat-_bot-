@@ -11,19 +11,8 @@ from keyboards import main_kb
 from states import UkassaPayment
 from yookassa import Configuration, Payment, Receipt
 from utils import inform_admins
-import hashlib
-from datetime import datetime, timedelta
-import json
-import random
-import string
-import http.client
-from ..search_engine import send_chat_request
 
 router = Router()
-env = Env()
-t_token = env('t_api')
-t_password = env('t_pass')
-terminal_key = env.str('t_key')
 
 
 async def calculate_price_without_vat(price_with_vat, vat_rate):
@@ -34,118 +23,68 @@ async def calculate_price_without_vat(price_with_vat, vat_rate):
 # Функция для создания платежа
 async def create_payment(amount, description, return_url=None):
     try:
-        amount_rub = amount
-        amount = amount * 100
+        env = Env()
+        Configuration.account_id = env.int('uk_shop_id')
+        Configuration.secret_key = env.str('uk_api')
+        idempotence_key = str(uuid.uuid4())
+        print(Configuration.account_id)
+        print(Configuration.secret_key)
+
         return_url = 'https://t.me/Gifdeomes_bot'
-        invoice_number = ''.join(random.choices(string.digits, k=15))
-        due_date = (datetime.now() + timedelta(hours=6)).strftime('%Y-%m-%d')
-        invoice_date = datetime.now().strftime('%Y-%m-%d')
-
-        # Корневые параметры для токена
-        params = {
-            "TerminalKey": terminal_key,
-            "Amount": amount,  # Сумма в копейках
-            "OrderId": invoice_number,
-            "Description": "Платеж за товар",
-            "Password": t_password
-        }
-
-        # Сортируем параметры по ключу и конкатенируем их значения
-        sorted_values = ''.join(str(params[k]) for k in sorted(params.keys()))
-
-        # Вычисляем SHA-256 хеш
-        token = hashlib.sha256(sorted_values.encode('utf-8')).hexdigest()
-
-        conn = http.client.HTTPSConnection("securepay.tinkoff.ru")
-        payload = json.dumps({
-            "TerminalKey": terminal_key,
-            "Amount": amount,
-            "OrderId": invoice_number,
-            "Description": "Платеж за товар",
-            "Token": token,
-
-            "Receipt": {
-                "Email": "stepdronpro@gmail.com",
-                "Phone": "+79031234555",
-                "Taxation": "osn",
-                "Items": [
+        price_wv = await calculate_price_without_vat(amount, 20)
+        payment = Payment.create({
+            "amount": {
+                "value": amount,
+                "currency": "RUB"
+            },
+            "confirmation": {
+                "type": "redirect",
+                "return_url": return_url
+            },
+            "description": f"{description}",
+            "capture": True,
+            "receipt": {
+                "customer": {
+                    "email": "stepusiktwitch@gmail.com"
+                },
+                "items": [
                     {
-                        "Name": "Оплата чата",
-                        "Price": amount,
-                        "Quantity": 1,
-                        "Amount": amount,
-                        "Tax": "vat10",
-                    }
+                        "description": "Пополнение баланса в Gifdeomes_bot",
+                        "quantity": 1,
+                        "amount": {
+                            "value": amount,
+                            "currency": "RUB"
+                        },
+                        "vat_code": "1"}
                 ]
-            }
-        })
+            },
+        }, idempotence_key)
 
-        headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': f'Bearer {t_token}'
-        }
-        conn.request("POST", "/v2/Init", payload, headers)
-        res = conn.getresponse()
-        data = res.read()
-        print(data.decode("utf-8"))
-        # Декодируем байты и парсим JSON
-        response_json = json.loads(data.decode("utf-8"))
-        payment_id = response_json.get('PaymentId')
-        payment_url = response_json.get('PaymentURL')
-        print(f'Payment ID: {payment_id}')
-        return payment_id, payment_url, amount_rub
-
+        payment_status = payment.status
+        receipt_status = payment.receipt_registration
+        print(f'status: {payment_status}')
+        print(f'receipt_reg: {receipt_status}')
+        await asyncio.sleep(3)
+        conf_url = payment.confirmation.confirmation_url
+        return payment.id, conf_url, amount
     except Exception as e:
         print(e)
         logger.error("Произошла ошибка:", e)
+        return None
 
 
 # Функция для проверки статуса платежа
 async def check_payment_status(payment_id):
     try:
-        params = {
-            "TerminalKey": terminal_key,
-            "PaymentId": payment_id,
-            "Password": t_password
-        }
-
-        # Сортируем параметры по ключу и конкатенируем их значения
-        sorted_values = ''.join(str(params[k]) for k in sorted(params.keys()))
-        token = hashlib.sha256(sorted_values.encode('utf-8')).hexdigest()
-        conn = http.client.HTTPSConnection("securepay.tinkoff.ru")
-        payload = json.dumps({
-            "TerminalKey": terminal_key,
-            "PaymentId": payment_id,
-            "Token": token,
-        })
-        headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-        }
-        conn.request("POST", "/v2/GetState", payload, headers)
-        res = conn.getresponse()
-        data = res.read()
-        print(data.decode("utf-8"))
-        # Декодируем байты и парсим JSON
-        response_json = json.loads(data.decode("utf-8"))
-        pay_status = response_json.get('Status')
-        print(f'Payment status: {pay_status}')
-        return pay_status
+        payment = Payment.find_one(payment_id)
+        status = payment.status
+        rec_status = payment.receipt_registration
+        print(f'status: {status}')
+        print(f'rec status: {rec_status}')
+        return status
     except Exception as e:
         print("Произошла ошибка:", e)
         return None
-
-    # try:
-    #     payment = Payment.find_one(payment_id)
-    #     status = payment.status
-    #     rec_status = payment.receipt_registration
-    #     print(f'status: {status}')
-    #     print(f'rec status: {rec_status}')
-    #     return status
-    # except Exception as e:
-    #     print("Произошла ошибка:", e)
-    #     return None
 
 # Пример использования
 
@@ -169,8 +108,6 @@ async def p_add_balance(callback: CallbackQuery, state: FSMContext):
 async def p_add_balance(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     amount = callback.data.split('_')[-1]
-    g_id = int(callback.data.split('_')[-2])
-    hours = callback.data.split('_')[-3]
     await state.set_state(UkassaPayment.input_value)
     uid = callback.from_user.id
     try:
@@ -183,7 +120,7 @@ async def p_add_balance(callback: CallbackQuery, state: FSMContext):
         if payment_id:
             print("Платеж успешно создан:", payment_id)
             print("Ссылка для оплаты:", conf_url)
-            await callback.message.answer(f'Пополнение баланса на <b>{amount}</b> рублей.', reply_markup=main_kb.pay_btns_fxd(payment_id, conf_url, amount, g_id, hours))
+            await callback.message.answer(f'Пополнение баланса на <b>{amount}</b> рублей.', reply_markup=main_kb.pay_btns(payment_id, conf_url, amount))
             await state.clear()
         else:
             await callback.message.answer('Произошло ошибка при отправке запроса. Пожалуйста, попробуйте позже.')
@@ -218,21 +155,15 @@ async def p_buy_ukassa(message: Message, bot: aiogram_bot, state: FSMContext):
 
 
 @router.callback_query(F.data.startswith('check_pay_status'))
-async def p_check_pay_status(call: CallbackQuery, state: FSMContext):
+async def p_check_pay_status(call: CallbackQuery):
     username = call.from_user.username
     uid = call.from_user.id
     logger.info(f'{uid} checking payment status')
-    if len(call.data.split('_')) == 5:
-        g_id = None
-    else:
-        g_id = int(call.data.split('_')[-3])
-        hours = call.data.split('_')[-4]
-
     pid = call.data.split('_')[-2]
     amount = call.data.split('_')[-1]
     uid = call.from_user.id
     status = await check_payment_status(pid)
-    if status == 'CONFIRMED' and g_id is not None:
+    if status == 'succeeded':
         await db.top_up_balance(uid, int(amount))
         u_balance = await db.get_user_balance(uid)
         await call.message.edit_text(f'\n<b>Платеж принят.</b>'
@@ -240,21 +171,6 @@ async def p_check_pay_status(call: CallbackQuery, state: FSMContext):
                                      f'\n<b>Баланс:</b> {u_balance} рублей')
         adm_text = f'{username} пополнил баланс на {amount} рублей.'
         await inform_admins(adm_text)
-        await db.withdraw_from_balance(uid, int(amount))
-        await send_chat_request(hours, call, g_id, state, uid)
-    elif status == 'CONFIRMED' and g_id is None:
-        await db.top_up_balance(uid, int(amount))
-        u_balance = await db.get_user_balance(uid)
-        await call.message.edit_text(f'\n<b>Платеж принят.</b>'
-                                     f'\nЗачислено: <b>{amount}</b> рублей'
-                                     f'\n<b>Баланс:</b> {u_balance} рублей')
-        adm_text = f'{username} пополнил баланс на {amount} рублей.'
-        await inform_admins(adm_text)
-    elif status == 'REJECTED':
-        await call.message.edit_text(f'\n<b>Платеж отменен.</b>'
-                                     f'\nНа вашей карте недостаточно средств.')
-        await state.clear()
-        return
     else:
         await call.message.answer('Платеж еще не обработан.')
 
@@ -294,7 +210,7 @@ async def p_check_pay_status(call: CallbackQuery, state: FSMContext):
 @router.message(UkassaPayment.input_value)
 async def process_inv_sum(message: Message):
     await message.answer('Неверная сумма пополнения!'
-                         '\nМинимальная сумма пополнения - <b>300 рублей</b>')
+                         '\nМинимальная сумма пополнения - <b>500 рублей</b>')
 
 
 @router.pre_checkout_query(lambda query: True)

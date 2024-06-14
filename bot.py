@@ -6,7 +6,7 @@ from config.logger import logger
 from keyboards import set_commands_menu
 from database import db
 from handlers import start, game_menu, unknown_command, user_lk, pop_up_commands, search_engine, reviews
-from handlers.admin_panel import edit_descriptions, panel_menu
+from handlers.admin_panel import edit_descriptions, panel_menu, edit_revs
 from handlers.payment import ukassa, promo_code
 from middlewares import CheckSubMiddleware
 
@@ -23,6 +23,7 @@ async def start_params() -> None:
     dp.include_router(promo_code.router)
     dp.include_router(search_engine.router)
     dp.include_router(reviews.router)
+    dp.include_router(edit_revs.router)
     dp.include_router(unknown_command.router)
 
     dp.message.middleware(CheckSubMiddleware())
@@ -39,6 +40,8 @@ async def start_params() -> None:
     # Пропускаем накопившиеся апдейты и запускаем polling
     await aiogram_bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(aiogram_bot)
+
+
 
 
 async def main():

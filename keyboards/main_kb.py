@@ -10,9 +10,11 @@ def start_btns(uid):
         kb_builder.button(text='Выбрать игру', callback_data='select_game')
         kb_builder.button(text='Личный кабинет', callback_data='user_lk')
         kb_builder.button(text='Админ панель', callback_data='admin_panel')
+        kb_builder.button(text='Тех. Поддержка', url='https://t.me/stepusiks')
     else:
         kb_builder.button(text='Выбрать игру', callback_data='select_game')
         kb_builder.button(text='Личный кабинет', callback_data='user_lk')
+        kb_builder.button(text='Тех. Поддержка', url='https://t.me/stepusiks')
 
     kb_builder.adjust(2)
     return kb_builder.as_markup(resize_keyboard=True)
@@ -47,6 +49,7 @@ def adm_p_menu():
     kb_builder.button(text='Пользователи', callback_data='adm_get_users')
     kb_builder.button(text='Редактировать описания', callback_data='adm_edit_descriptions')
     kb_builder.button(text='Промо-коды', callback_data='edit_promo_codes')
+    kb_builder.button(text='Отзывы', callback_data='edit_reviews')
     kb_builder.button(text='Назад', callback_data='back_to_main')
 
     kb_builder.adjust(1)
@@ -68,8 +71,9 @@ def bg_menu(g_id):
     kb_builder.button(text='Оплатить', callback_data=f'bg_buy_{g_id}')
     kb_builder.button(text='Отзывы', callback_data=f'revs_{g_id}')
 
-    kb_builder.adjust(1)
+    kb_builder.adjust(2)
     return kb_builder.as_markup(resize_keyboard=True)
+
 
 
 def sg_btn():
@@ -89,9 +93,9 @@ def buy_girl(g_id, price):
     return kb_builder.as_markup(resize_keyboard=True)
 
 
-def buy_girl_fxd(g_id, price):
+def buy_girl_fxd(g_id, price, hours):
     kb_builder = InlineKeyboardBuilder()
-    kb_builder.button(text='Купить доступ', callback_data=f'add_fxd_balance_{g_id}_{price}')
+    kb_builder.button(text='Купить доступ', callback_data=f'add_fxd_balance_{hours}_{g_id}_{price}')
     kb_builder.button(text='Отмена', callback_data=f'cancel_buy_girl')
 
     kb_builder.adjust(1)
@@ -102,6 +106,15 @@ def pay_btns(pid, conf_url, amount):
     kb_builder = InlineKeyboardBuilder()
     kb_builder.button(text='Оплатить', url=conf_url)
     kb_builder.button(text='Проверить статус', callback_data=f'check_pay_status_{pid}_{amount}')
+
+    kb_builder.adjust(1)
+    return kb_builder.as_markup(resize_keyboard=True)
+
+
+def pay_btns_fxd(pid, conf_url, amount, g_id, hours):
+    kb_builder = InlineKeyboardBuilder()
+    kb_builder.button(text='Оплатить', url=conf_url)
+    kb_builder.button(text='Проверить статус', callback_data=f'check_pay_status_{hours}_{g_id}_{pid}_{amount}')
 
     kb_builder.adjust(1)
     return kb_builder.as_markup(resize_keyboard=True)
@@ -125,3 +138,45 @@ def del_promo_codes(codes):
     kb_builder.adjust(1)
     return kb_builder.as_markup(resize_keyboard=True)
 
+def del_last_lk():
+    kb_builder = InlineKeyboardBuilder()
+    kb_builder.button(text='Назад', callback_data='user_lk')
+    kb_builder.adjust(1)
+    return kb_builder.as_markup(resize_keyboard=True)
+
+def del_last_promo():
+    kb_builder = InlineKeyboardBuilder()
+    kb_builder.button(text='Отменить', callback_data='del_last_promo')
+    kb_builder.adjust(1)
+    return kb_builder.as_markup(resize_keyboard=True)
+
+def rev_menu(g_id):
+    kb_builder = InlineKeyboardBuilder()
+    kb_builder.button(text='Написать', callback_data=f'create_rev_{g_id}')
+    kb_builder.button(text='Отказаться', callback_data='pass_rev')
+    kb_builder.adjust(2)
+    return kb_builder.as_markup(resize_keyboard=True)
+
+
+def chat_menu(user_1_id, hours):
+    kb_builder = InlineKeyboardBuilder()
+    kb_builder.button(text='Принять', callback_data=f'accept_{hours}_{user_1_id}')
+    kb_builder.button(text='Отменить', callback_data=f'decline_{user_1_id}')
+    kb_builder.adjust(2)
+    return kb_builder.as_markup(resize_keyboard=True)
+
+
+def edit_revs_menu(g_id):
+        kb_builder = InlineKeyboardBuilder()
+        kb_builder.button(text='Отзывы', callback_data=f'adm_edit_revs_{g_id}')
+
+        kb_builder.adjust(2)
+        return kb_builder.as_markup(resize_keyboard=True)
+
+
+def adm_del_rev(rev_id):
+    kb_builder = InlineKeyboardBuilder()
+    kb_builder.button(text='Удалить', callback_data=f'adm_del_rev_{rev_id}')
+
+    kb_builder.adjust(2)
+    return kb_builder.as_markup(resize_keyboard=True)
