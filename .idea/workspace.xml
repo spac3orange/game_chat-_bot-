@@ -6,6 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="479a878a-88d0-4f44-a91d-b5e79be9937a" name="Changes" comment="v 2.0 final">
       <change afterPath="$PROJECT_DIR$/config/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/payment/tinkoff.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/payment/tinkoff.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -199,7 +201,15 @@
       <option name="project" value="LOCAL" />
       <updated>1718384083203</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="v 2.0 final">
+      <option name="closed" value="true" />
+      <created>1718384442252</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1718384442252</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

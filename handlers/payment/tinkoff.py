@@ -120,7 +120,7 @@ async def check_payment_status(payment_id):
         return None
 
 
-pay_id = asyncio.run(create_payment(100, 1))
+# pay_id = asyncio.run(create_payment(100, 1))
 
-asyncio.run(check_payment_status(pay_id))
+# asyncio.run(check_payment_status(pay_id))
 # "Status":"NEW", "Status":"CONFIRMED", "Status":"REJECTED"
