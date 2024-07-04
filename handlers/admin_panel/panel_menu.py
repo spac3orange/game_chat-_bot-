@@ -63,9 +63,9 @@ async def p_adm_gu(callback: CallbackQuery):
     all_users = await db.get_all_users()
     for u in all_users:
         try:
-            await callback.message.answer(text=f'{u["user_id"]}'
-                                               f'\n{u["username"]}'
-                                               f'\n{u["balance"]} рублей')
+            await callback.message.answer(text=f'id: {u["user_id"]}'
+                                               f'\nusername: {u["username"]}'
+                                               f'\nbalance: {u["balance"]} рублей')
         except Exception as e:
             logger.error(e)
 
