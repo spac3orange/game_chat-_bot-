@@ -4,10 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="479a878a-88d0-4f44-a91d-b5e79be9937a" name="Changes" comment="v 2.0 final">
+    <list default="true" id="479a878a-88d0-4f44-a91d-b5e79be9937a" name="Changes" comment="v 2.1 final">
       <change afterPath="$PROJECT_DIR$/config/.env" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/states/states.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handlers/payment/tinkoff.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/payment/tinkoff.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/admin_panel/edit_revs.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/admin_panel/edit_revs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/search_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/search_engine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/keyboards/main_kb.py" beforeDir="false" afterPath="$PROJECT_DIR$/keyboards/main_kb.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/states/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/states/__init__.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,7 +40,8 @@
     "Python.tinkoff.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "D:/MyProjects/Work Projects/Work_2024/game_chat_bot/handlers/payment"
+    "last_opened_file_path": "D:/MyProjects/Work Projects/Work_2024/game_chat_bot/handlers/search_engine.py",
+    "two.files.diff.last.used.file": "D:/MyProjects/Work Projects/Work_2024/game_chat_bot/handlers/search_engine.py"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -209,7 +214,15 @@
       <option name="project" value="LOCAL" />
       <updated>1718384442252</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="v 2.1 final">
+      <option name="closed" value="true" />
+      <created>1718386283121</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1718386283121</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -226,6 +239,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="v 1.0" />
     <MESSAGE value="v 2.0 final" />
-    <option name="LAST_COMMIT_MESSAGE" value="v 2.0 final" />
+    <MESSAGE value="v 2.1 final" />
+    <option name="LAST_COMMIT_MESSAGE" value="v 2.1 final" />
   </component>
 </project>

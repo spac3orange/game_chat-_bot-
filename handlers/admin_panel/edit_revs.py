@@ -8,6 +8,9 @@ from config import logger, aiogram_bot
 from filters.is_admin import IsAdmin
 from keyboards import main_kb
 from database import db
+import json
+from aiogram.types import InputMediaPhoto, InputFile
+from aiogram.utils.media_group import MediaGroupBuilder
 
 
 router = Router()
@@ -32,10 +35,17 @@ async def p_edit_revs(callback: CallbackQuery):
             g_name, g_age = girl['name'], girl['age']
             data = (f'<b>{g_name}</b>, {g_age}'
                     f'\n<b>Игры:</b> {girl["games"]}'
-                    f'f\n{girl["description"]}'
+                    f'f\n<b>О себе:</b> {girl["description"]}'
                     f'\n<b>Час игры: </b> {girl["price"]}')
-            media = await parse_media(girl['avatar_path'])
-            await callback.message.answer_photo(photo=media, caption=data, reply_markup=main_kb.edit_revs_menu(g_id))
+            avatar_paths = json.loads(girl['avatar_path'])
+            print(avatar_paths)
+            # Создание альбома медиафайлов
+            album_builder = MediaGroupBuilder()
+            for avatar_path in avatar_paths:
+                album_builder.add_photo(media=FSInputFile(avatar_path))
+            if album_builder:
+                await callback.message.answer_media_group(media=album_builder.build())
+                await callback.message.answer(text=data, reply_markup=main_kb.edit_revs_menu(g_id))
             await asyncio.sleep(0.5)
 
 

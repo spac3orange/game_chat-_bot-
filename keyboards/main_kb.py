@@ -180,3 +180,19 @@ def adm_del_rev(rev_id):
 
     kb_builder.adjust(2)
     return kb_builder.as_markup(resize_keyboard=True)
+
+
+def web_q(g_price, message_id, g_id):
+    kb_builder = InlineKeyboardBuilder()
+    kb_builder.button(text='Да', callback_data=f'web_q_y_{message_id}_{g_price}_{g_id}')
+    kb_builder.button(text='Нет', callback_data=f'web_q_n_{message_id}_{g_price}_{g_id}')
+    kb_builder.adjust(2)
+    return kb_builder.as_markup(resize_keyboard=True)
+
+
+def alone_q(g_price, message_id, g_id):
+    kb_builder = InlineKeyboardBuilder()
+    kb_builder.button(text='Да', callback_data=f'complete_buy_girl_{message_id}_{g_price}_{g_id}')
+    kb_builder.button(text='Нет', callback_data=f'alone_q_n_{message_id}_{g_price}_{g_id}')
+    kb_builder.adjust(2)
+    return kb_builder.as_markup(resize_keyboard=True)

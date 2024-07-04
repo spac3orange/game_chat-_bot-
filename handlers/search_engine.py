@@ -8,8 +8,11 @@ from datetime import datetime, timedelta
 from config import logger, aiogram_bot
 from keyboards import main_kb
 from database import db
-from states import SearchGirls, UkassaPayment, BuyGirl, ChatConnect
+from states import SearchGirls, UkassaPayment, BuyGirl, ChatConnect, PeopleCount
 from utils import inform_admins, Scheduler
+import json
+from aiogram.types import InputMediaPhoto, InputFile
+from aiogram.utils.media_group import MediaGroupBuilder
 
 
 router = Router()
@@ -39,7 +42,7 @@ async def send_chat_request(hours: str, message: Message | CallbackQuery, g_id: 
     # Notify User 2 (replace USER_2_ID with the actual user id)
     user2_id = g_id
     try:
-        await aiogram_bot.send_message(user2_id, f"Пользователь @{message.from_user.username} хочет начать чат с вами.",
+        await aiogram_bot.send_message(user2_id, f"Пользователь хочет начать чат с вами.",
                                        reply_markup=main_kb.chat_menu(uid, hours))
 
     except Exception as e:
@@ -118,11 +121,18 @@ async def search_girls(girls: dict, callback: CallbackQuery, stop_event: asyncio
             g_name, g_age = girl['name'], girl['age']
             data = (f'<b>{g_name}</b>, {g_age}'
                     f'\n<b>Игры:</b> {girl["games"]}'
-                    f'\n{girl["description"]}'
+                    f'\n<b>О себе:</b> {girl["description"]}'
                     f'\n<b>Час игры: </b> {girl["price"]}'
                     f'\n<b>Статус:</b> {g_status}')
-            media = await parse_media(girl['avatar_path'])
-            await callback.message.answer_photo(photo=media, caption=data, reply_markup=main_kb.bg_menu(g_id))
+            avatar_paths = json.loads(girl['avatar_path'])
+            print(avatar_paths)
+            # Создание альбома медиафайлов
+            album_builder = MediaGroupBuilder()
+            for avatar_path in avatar_paths:
+                album_builder.add_photo(media=FSInputFile(avatar_path))
+            if album_builder:
+                await callback.message.answer_media_group(media=album_builder.build())
+                await callback.message.answer(text=data, reply_markup=main_kb.bg_menu(g_id))
             await asyncio.sleep(random.randint(3, 7))
 
 
@@ -189,25 +199,123 @@ async def p_bg_buy(callback: CallbackQuery, state: FSMContext):
                  f'\n{g["description"]}'
                  f'\n<b>Час игры:</b> {g["price"]} ')
         g_price = g["price"]
-        g_avatar = await parse_media(g["avatar_path"])
+        # g_avatar = await parse_media(g["avatar_path"])
 
-    await callback.message.answer_photo(photo=g_avatar,
-                                        caption='<b>Выбрана девушка:</b>'
-                                                f'\n{g_str}'
-                                                f'\n\nЧтобы открыть контактные данные девушки для совместной игры, оплатите доступ.'
-                                                f'\n<b>Цена:</b> {g_price} рублей', reply_markup=main_kb.buy_girl(g_id, g_price))
+        avatar_paths = json.loads(g['avatar_path'])
+        print(avatar_paths)
+        # Создание альбома медиафайлов
+        album_builder = MediaGroupBuilder()
+        for avatar_path in avatar_paths:
+            album_builder.add_photo(media=FSInputFile(avatar_path))
+        if album_builder:
+            await callback.message.answer_media_group(media=album_builder.build())
+            await callback.message.answer(text='<b>Выбрана девушка:</b>'
+                                               f'\n{g_str}'
+                                               f'\n\nЧтобы открыть контактные данные девушки для совместной игры, оплатите доступ.'
+                                               f'\n<b>Цена:</b> {g_price} рублей', reply_markup=main_kb.buy_girl(g_id, g_price))
+
+
+
 
 
 @router.callback_query(F.data.startswith('buy_girl_'))
 async def p_bg_buy(call: CallbackQuery, state: FSMContext):
     await call.answer()
-    await state.set_state(BuyGirl.input_hours)
     g_id = call.data.split('_')[-2]
-    await state.update_data(g_id=g_id)
     g_data = await db.get_girls_by_id(int(g_id))
     for g in g_data:
         g_price = g['price']
-        await state.update_data(price=g_price)
+    msg = await call.message.answer(f'<b>Стоимость одного часа:</b> {g_price} рублей.'
+                                        f'\nХотите ли вы,чтобы девушка включила веб-камеру?')
+    mkup = main_kb.web_q(g_price, msg.message_id, g_id)
+    await aiogram_bot.edit_message_reply_markup(
+        chat_id=call.message.chat.id,
+        message_id=msg.message_id,
+        reply_markup=mkup
+    )
+
+
+@router.callback_query(F.data.startswith('web_q_y_'))
+async def p_bg_web_y(call: CallbackQuery, state: FSMContext):
+    await call.answer()
+    g_id = call.data.split('_')[-1]
+    g_price = int(call.data.split('_')[-2]) + 200
+
+    del_mes = call.data.split('_')[-3]
+    await aiogram_bot.delete_message(call.message.chat.id, int(del_mes))
+    msg = await call.message.answer(f'<b>Стоимость одного часа:</b> {g_price} рублей.\nВы будете один?')
+    mkup = main_kb.alone_q(g_price, msg.message_id, g_id)
+    await aiogram_bot.edit_message_reply_markup(
+        chat_id=call.message.chat.id,
+        message_id=msg.message_id,
+        reply_markup=mkup
+    )
+
+@router.callback_query(F.data.startswith('web_q_n_'))
+async def p_bg_web_n(call: CallbackQuery, state: FSMContext):
+    await call.answer()
+    g_id = call.data.split('_')[-1]
+    g_price = int(call.data.split('_')[-2])
+    del_mes = call.data.split('_')[-3]
+    await aiogram_bot.delete_message(call.message.chat.id, int(del_mes))
+    msg = await call.message.answer(f'<b>Стоимость одного часа:</b> {g_price} рублей.\nВы будете один?')
+    mkup = main_kb.alone_q(g_price, msg.message_id, g_id)
+    await aiogram_bot.edit_message_reply_markup(
+        chat_id=call.message.chat.id,
+        message_id=msg.message_id,
+        reply_markup=mkup
+    )
+
+
+# @router.callback_query(F.data.startswith('alone_q_y_'))
+# async def p_alone_q_y(call: CallbackQuery, state: FSMContext):
+#     await call.answer()
+#     g_id = call.data.split('_')[-1]
+#     g_price = int(call.data.split('_')[-2]) + 200
+#     del_mes = call.data.split('_')[-3]
+#     await aiogram_bot.delete_message(call.chat.id, int(del_mes))
+#     msg = await call.message.answer(f'<b>Стоимость одного часа:</b> {g_price} рублей.')
+#
+#
+#
+@router.callback_query(F.data.startswith('alone_q_n_'))
+async def p_alone_q_n(call: CallbackQuery, state: FSMContext):
+    await call.answer()
+    g_id = call.data.split('_')[-1]
+    g_price = int(call.data.split('_')[-2])
+    del_mes = call.data.split('_')[-3]
+    await aiogram_bot.delete_message(call.message.chat.id, int(del_mes))
+    msg = await call.message.answer(f'Сколько будет людей?')
+    await state.set_state(PeopleCount.input_ppl)
+    await state.update_data(g_id=g_id, g_price=g_price, msg=msg)
+
+
+@router.message(PeopleCount.input_ppl, lambda message: message.text.isdigit() and int(message.text) <= 10)
+async def p_bg_buy_wppl(message: Message, state: FSMContext):
+    ppl = int(message.text)
+    data = await state.get_data()
+    await state.clear()
+    ttl_price = int(data['g_price']) + ppl * 10
+    await state.set_state(BuyGirl.input_hours)
+    g_id = data['g_id']
+    await state.update_data(g_id=g_id)
+    await state.update_data(price=ttl_price)
+    g_data = await db.get_girls_by_id(int(g_id))
+    await message.answer(f'<b>Стоимость одного часа:</b> {ttl_price} рублей'
+                          '\nВведите количество <b>часов (цифра)</b>: ')
+    await state.set_state(BuyGirl.process_req)
+
+
+@router.callback_query(F.data.startswith('complete_buy_girl_'))
+async def p_bg_buy(call: CallbackQuery, state: FSMContext):
+    await call.answer()
+    await state.set_state(BuyGirl.input_hours)
+    g_id = call.data.split('_')[-1]
+    g_price = call.data.split('_')[-2]
+    await state.update_data(g_id=g_id)
+    await state.update_data(price=g_price)
+    g_data = await db.get_girls_by_id(int(g_id))
+
     await call.message.answer(f'<b>Стоимость одного часа:</b> {g_price} рублей'
                               '\nВведите количество <b>часов (цифра)</b>: ')
     await state.set_state(BuyGirl.process_req)
@@ -275,11 +383,13 @@ async def p_acc_chat(callback: CallbackQuery, state: FSMContext):
                                           "\n\n<b>Управление чатом:</b> "
                                           "\n<b>Проверить оставшееся время чата:</b> /remaining_time"
                                           "\n<b>Остановить чат:</b> /stop_chat", reply_markup=None)
+    await callback.message.answer('Перейдите на "ссылка дискорда", займите свободную комнату, дождитесь заказчика и переместите его из лобби ожидания')
     await aiogram_bot.send_message(user_1_id, "Пользователь принял вашу заявку. Чат запущен."
                                               "\nВам был начислен бонус: 10 минут чата."
                                               "\n\n<b>Управление чатом:</b> "
                                               "\n<b>Проверить оставшееся время чата:</b> /remaining_time"
                                               "\n<b>Остановить чат:</b> /stop_chat")
+    await aiogram_bot.send_message(user_1_id, 'Перейдите на "ссылка дискорда", зайдите в Waiting Room, сообщите девушке свой никнейм в Telegram чате')
     await state.set_state(ChatConnect.chatting)
     await state.update_data(user_1=user_1_id, user_2=user_2_id)
     await db.set_user_state(user_2_id, state=await state.get_state())
