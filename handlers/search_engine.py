@@ -108,6 +108,7 @@ async def search_girls(girls: dict, callback: CallbackQuery, stop_event: asyncio
                     g_status = 'Занята 🟡'
                 case 'None':
                     g_status = 'Онлайн 🟢'
+            print(g_status)
             match g_shift['shift_status']:
                 case 'Offline':
                     g_status = 'Оффлайн 🔴'
@@ -116,6 +117,7 @@ async def search_girls(girls: dict, callback: CallbackQuery, stop_event: asyncio
                         g_status = 'Онлайн 🟢'
                     else:
                         g_status = 'Занята 🟡'
+            print(g_status)
 
             await aiogram_bot.send_chat_action(callback.message.chat.id, 'typing', request_timeout=1)
             g_name, g_age = girl['name'], girl['age']

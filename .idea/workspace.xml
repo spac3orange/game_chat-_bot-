@@ -4,14 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="479a878a-88d0-4f44-a91d-b5e79be9937a" name="Changes" comment="v 2.1 final">
+    <list default="true" id="479a878a-88d0-4f44-a91d-b5e79be9937a" name="Changes" comment="v 3.0 final">
       <change afterPath="$PROJECT_DIR$/config/.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/states/states.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handlers/admin_panel/edit_revs.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/admin_panel/edit_revs.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handlers/search_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/search_engine.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/keyboards/main_kb.py" beforeDir="false" afterPath="$PROJECT_DIR$/keyboards/main_kb.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/states/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/states/__init__.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -222,7 +218,23 @@
       <option name="project" value="LOCAL" />
       <updated>1718386283121</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="v 3.0 final">
+      <option name="closed" value="true" />
+      <created>1720118964875</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1720118964875</updated>
+    </task>
+    <task id="LOCAL-00006" summary="v 3.0 final">
+      <option name="closed" value="true" />
+      <created>1720119257351</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1720119257351</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -240,6 +252,7 @@
     <MESSAGE value="v 1.0" />
     <MESSAGE value="v 2.0 final" />
     <MESSAGE value="v 2.1 final" />
-    <option name="LAST_COMMIT_MESSAGE" value="v 2.1 final" />
+    <MESSAGE value="v 3.0 final" />
+    <option name="LAST_COMMIT_MESSAGE" value="v 3.0 final" />
   </component>
 </project>
