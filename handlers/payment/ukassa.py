@@ -23,7 +23,7 @@ router = Router()
 env = Env()
 t_token = env('t_api')
 t_password = env('t_pass')
-terminal_key = env.str('t_key')
+terminal_key = env('t_key')
 
 
 async def calculate_price_without_vat(price_with_vat, vat_rate):
@@ -61,7 +61,7 @@ async def create_payment(amount, description, return_url=None):
             "TerminalKey": terminal_key,
             "Amount": amount,
             "OrderId": invoice_number,
-            "Description": "Платеж за товар",
+            "Description": "Платеж за услугу чата",
             "Token": token,
 
             "Receipt": {
@@ -70,7 +70,7 @@ async def create_payment(amount, description, return_url=None):
                 "Taxation": "osn",
                 "Items": [
                     {
-                        "Name": "Оплата чата",
+                        "Name": "Оплата за услугу чата",
                         "Price": amount,
                         "Quantity": 1,
                         "Amount": amount,
