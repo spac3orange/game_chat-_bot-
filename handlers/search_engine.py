@@ -373,7 +373,8 @@ async def p_cbg(callback: CallbackQuery):
 
 @router.callback_query(F.data.startswith('decline_'))
 async def p_dec_chat(call: CallbackQuery, state: FSMContext):
-    user_1_id = (await state.get_data())['self_id']
+    data = await state.get_data()
+    user_1_id = data['self_id']
     await call.message.answer("Вы отменили запрос чата.")
     await aiogram_bot.send_message(user_1_id, "Пользователь отменил запрос на чат.")
     await state.clear()
