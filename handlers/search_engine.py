@@ -151,6 +151,7 @@ async def p_search_girls(callback: CallbackQuery, state: FSMContext):
     game = games_dict[game]
     print(game)
     girls = await db.get_girls_by_game(game)
+    random.shuffle(girls)
     print(girls)
     if girls:
         await callback.message.answer('Запущен поиск... ⌛️'
