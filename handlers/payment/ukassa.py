@@ -46,7 +46,7 @@ async def create_payment(amount, description, return_url=None):
             "TerminalKey": terminal_key,
             "Amount": amount,  # Сумма в копейках
             "OrderId": invoice_number,
-            "Description": "Платеж за товар",
+            "Description": f"Пополнение баланса на {amount_rub} рублей",
             "Password": t_password
         }
 
@@ -61,7 +61,7 @@ async def create_payment(amount, description, return_url=None):
             "TerminalKey": terminal_key,
             "Amount": amount,
             "OrderId": invoice_number,
-            "Description": "Платеж за услугу чата",
+            "Description": f"Пополнение баланса на {amount_rub} рублей",
             "Token": token,
 
             "Receipt": {
@@ -70,7 +70,7 @@ async def create_payment(amount, description, return_url=None):
                 "Taxation": "osn",
                 "Items": [
                     {
-                        "Name": "Оплата за услугу чата",
+                        "Name": f"Пополнение баланса на {amount_rub} рублей",
                         "Price": amount,
                         "Quantity": 1,
                         "Amount": amount,
