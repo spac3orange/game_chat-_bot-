@@ -350,7 +350,7 @@ async def p_buy(message: Message, state: FSMContext):
             g_username = g['username']
         await message.answer(f'<b>Вы успешно оплатили доступ.</b> '
                              f'\nС вашего баланса списано <b>{g_price} руб.</b>.'
-                             f'\n\nПолучен <b>{hours}</b> игрового времени с <b>@{g_username}</b>'
+                             f'\n\nПолучено <b>{hours}</b> игрового времени с <b>@{g_username}</b>'
                              '\n<b>Приятной игры!</b>')
 
         adm_text = f'Пользователь {username} оплатил доступ к девушке {g_username}. Сумма: {g_price} руб.'
@@ -369,6 +369,15 @@ async def p_buy(message: Message, state: FSMContext):
 @router.callback_query(F.data == 'cancel_buy_girl')
 async def p_cbg(callback: CallbackQuery):
     await p_select_game(callback)
+
+
+@router.callback_query(F.data.startswith('decline_'))
+async def p_dec_chat(call: CallbackQuery, state: FSMContext):
+    user_1_id = (await state.get_data())['self_id']
+    await call.message.answer("Вы отменили запрос чата.")
+    await aiogram_bot.send_message(user_1_id, "Пользователь отменил запрос на чат.")
+    await state.clear()
+    await db.set_user_state(user_1_id, 'None')
 
 
 @router.callback_query(F.data.startswith('accept_'))
@@ -418,13 +427,7 @@ async def remaining_time_command(message: Message):
         await message.answer("Нет активного чата.")
 
 
-@router.callback_query(F.data.startswith('decline_'))
-async def p_dec_chat(call: CallbackQuery, state: FSMContext):
-    user_1_id = (await state.get_data())['self_id']
-    await call.message.answer("Вы отменили запрос чата..")
-    await aiogram_bot.send_message(user_1_id, "Пользователь отменил запрос на чат.")
-    await state.clear()
-    await db.set_user_state(user_1_id, 'None')
+
 
 
 @router.message(ChatConnect.chatting)
