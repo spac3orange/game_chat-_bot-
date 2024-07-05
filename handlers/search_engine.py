@@ -109,6 +109,7 @@ async def search_girls(girls: dict, callback: CallbackQuery, stop_event: asyncio
                 case 'None':
                     g_status = 'Онлайн 🟢'
             print(g_status)
+            print(g_shift)
             match g_shift['shift_status']:
                 case 'Offline':
                     g_status = 'Оффлайн 🔴'
