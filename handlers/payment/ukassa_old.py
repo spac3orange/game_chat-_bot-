@@ -1,15 +1,17 @@
 import asyncio
 import uuid
+
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, PreCheckoutQuery, LabeledPrice, CallbackQuery
+from aiogram.types import Message, PreCheckoutQuery, CallbackQuery
 from aiogram.types.message import ContentType
 from environs import Env
+from yookassa import Configuration, Payment
+
 from config import aiogram_bot, logger
 from database import db
 from keyboards import main_kb
 from states import UkassaPayment
-from yookassa import Configuration, Payment, Receipt
 from utils import inform_admins
 
 router = Router()
@@ -85,6 +87,7 @@ async def check_payment_status(payment_id):
     except Exception as e:
         print("Произошла ошибка:", e)
         return None
+
 
 # Пример использования
 
@@ -175,11 +178,6 @@ async def p_check_pay_status(call: CallbackQuery):
         await call.message.answer('Платеж еще не обработан.')
 
 
-
-
-
-
-
 # @router.message(UkassaPayment.input_value, lambda message: message.text.isdigit() and int(message.text) >= 500)
 # async def p_buy_ukassa(message: Message, bot: aiogram_bot, state: FSMContext):
 #    env = Env()
@@ -203,10 +201,6 @@ async def p_check_pay_status(call: CallbackQuery):
 #   await state.clear()
 
 
-
-
-
-
 @router.message(UkassaPayment.input_value)
 async def process_inv_sum(message: Message):
     await message.answer('Неверная сумма пополнения!'
@@ -228,10 +222,6 @@ async def successful_payment(message: Message, state: FSMContext):
     await db.top_up_balance(uid, amount)
     await state.clear()
     await p_lk(message)
-
-
-
-
 
     # if message.successful_payment:
     #     amount = message.successful_payment.total_amount // 100
@@ -280,6 +270,3 @@ async def successful_payment(message: Message, state: FSMContext):
     #         await message.answer('Произошла ошибка, попробуйте позже',
     #                                       reply_markup=kb_admin.lk_btns(),
     #                                       parse_mode='HTML')
-
-
-

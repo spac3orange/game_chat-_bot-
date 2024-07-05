@@ -1,9 +1,10 @@
+from datetime import datetime
+from typing import List, Dict
+
 import asyncpg
 from environs import Env
+
 from config import logger
-from typing import List, Dict, Tuple
-import asyncio
-from datetime import datetime
 
 
 class Database:
@@ -89,8 +90,6 @@ class Database:
                                        )
                                    """)
 
-
-
             await self.execute_query("""
                                        CREATE TABLE IF NOT EXISTS reviews (
                                            g_id BIGINT,
@@ -158,7 +157,6 @@ class Database:
             print("Error while fetching reviews for g_id:", error)
             return []
 
-
     async def write_bot_settings(self, user_id: int, photo_path: str, main_text: str, game_search_text: str) -> None:
         try:
             query = """
@@ -182,8 +180,6 @@ class Database:
         except (Exception, asyncpg.PostgresError) as error:
             print("Error while getting user balance:", error)
             return 0
-
-
 
     async def get_all_users(self):
         try:
@@ -247,7 +243,7 @@ class Database:
             else:
                 # Недостаточно средств для снятия
                 logger.error(f"Insufficient funds to withdraw {amount} for user {user_id}. Current balance: {current_balance}")
-        except (Exception,asyncpg.PostgresError) as error:
+        except (Exception, asyncpg.PostgresError) as error:
             logger.error(f"Error while topping up girl balance for girl {user_id}", error)
 
     async def get_girls_by_game(self, game_name: str):

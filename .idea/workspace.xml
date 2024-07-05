@@ -5,8 +5,35 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="479a878a-88d0-4f44-a91d-b5e79be9937a" name="Changes" comment="v 3.0 final">
+      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/config/.env" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/env_example.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/config_aiogram.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/config_aiogram.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/logger.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/logger.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/db_action.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/db_action.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/filters/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/filters/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/admin_panel/edit_descriptions.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/admin_panel/edit_descriptions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/admin_panel/edit_revs.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/admin_panel/edit_revs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/admin_panel/panel_menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/admin_panel/panel_menu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/game_menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/game_menu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/payment/promo_code.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/payment/promo_code.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/payment/tinkoff.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/payment/tinkoff.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handlers/payment/ukassa.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/payment/ukassa.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/payment/ukassa_old.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/payment/ukassa_old.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/pop_up_commands.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/pop_up_commands.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/reviews.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/reviews.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/search_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/search_engine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/start.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/start.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/unknown_command.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/unknown_command.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/user_lk.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/user_lk.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/keyboards/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/keyboards/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/keyboards/main_kb.py" beforeDir="false" afterPath="$PROJECT_DIR$/keyboards/main_kb.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/middlewares/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/middlewares/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/middlewares/check_sub_middleware.py" beforeDir="false" afterPath="$PROJECT_DIR$/middlewares/check_sub_middleware.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/scheduler.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/scheduler.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15,6 +42,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
@@ -36,6 +66,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "last_opened_file_path": "D:/MyProjects/Work Projects/Work_2024/game_chat_bot/handlers/search_engine.py",
+    "run.code.analysis.last.selected.profile": "pProject Default",
     "two.files.diff.last.used.file": "D:/MyProjects/Work Projects/Work_2024/game_chat_bot/handlers/search_engine.py"
   }
 }]]></component>
@@ -297,7 +328,31 @@
       <option name="project" value="LOCAL" />
       <updated>1720177948045</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="v 3.0 final">
+      <option name="closed" value="true" />
+      <created>1720181044318</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1720181044318</updated>
+    </task>
+    <task id="LOCAL-00016" summary="v 3.0 final">
+      <option name="closed" value="true" />
+      <created>1720181328444</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1720181328444</updated>
+    </task>
+    <task id="LOCAL-00017" summary="v 3.0 final">
+      <option name="closed" value="true" />
+      <created>1720183222981</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1720183222981</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

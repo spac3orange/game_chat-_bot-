@@ -1,9 +1,9 @@
-import asyncio
-import random
-from config import logger
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from handlers.reviews import send_rev_notif
 from datetime import datetime, timedelta
+
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+from config import logger
+from handlers.reviews import send_rev_notif
 
 
 class Scheduler:

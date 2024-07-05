@@ -19,7 +19,5 @@ def load_config(path: str | None = None) -> Config:
     return Config(tg_bot=TgBot(token=env('BOT_TOKEN')), admin_id=env('ADMIN_ID'))
 
 
-
-
 config_aiogram = load_config()
 aiogram_bot = Bot(token=config_aiogram.tg_bot.token, parse_mode='HTML')

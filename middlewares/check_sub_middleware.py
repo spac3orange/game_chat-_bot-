@@ -1,8 +1,9 @@
-import asyncio
-from typing import Any, Callable, Dict, Awaitable, Union
+from typing import Any, Callable, Dict, Awaitable
+
 from aiogram import BaseMiddleware
+from aiogram.types import TelegramObject
 from environs import Env
-from aiogram.types import TelegramObject, Message, CallbackQuery
+
 from config import aiogram_bot
 from config import logger
 from keyboards import main_kb

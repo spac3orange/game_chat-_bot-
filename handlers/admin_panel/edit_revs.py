@@ -1,17 +1,14 @@
 import asyncio
-import random
-from aiogram.types import Message, CallbackQuery, FSInputFile
-from aiogram.filters import CommandStart, Command
-from aiogram import Router, F
-from aiogram.fsm.context import FSMContext
-from config import logger, aiogram_bot
-from filters.is_admin import IsAdmin
-from keyboards import main_kb
-from database import db
 import json
-from aiogram.types import InputMediaPhoto, InputFile
+
+from aiogram import Router, F
+from aiogram.types import CallbackQuery, FSInputFile
 from aiogram.utils.media_group import MediaGroupBuilder
 
+from config import aiogram_bot
+from database import db
+from filters.is_admin import IsAdmin
+from keyboards import main_kb
 
 router = Router()
 router.message.filter(

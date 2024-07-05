@@ -3,6 +3,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from config import config_aiogram
 from environs import Env
 
+
 def start_btns(uid):
     admins = config_aiogram.admin_id
     kb_builder = InlineKeyboardBuilder()
@@ -75,7 +76,6 @@ def bg_menu(g_id):
     return kb_builder.as_markup(resize_keyboard=True)
 
 
-
 def sg_btn():
     buttons = [
         [KeyboardButton(text='Остановить поиск', callback_data='stop')]
@@ -138,17 +138,20 @@ def del_promo_codes(codes):
     kb_builder.adjust(1)
     return kb_builder.as_markup(resize_keyboard=True)
 
+
 def del_last_lk():
     kb_builder = InlineKeyboardBuilder()
     kb_builder.button(text='Назад', callback_data='user_lk')
     kb_builder.adjust(1)
     return kb_builder.as_markup(resize_keyboard=True)
 
+
 def del_last_promo():
     kb_builder = InlineKeyboardBuilder()
     kb_builder.button(text='Отменить', callback_data='del_last_promo')
     kb_builder.adjust(1)
     return kb_builder.as_markup(resize_keyboard=True)
+
 
 def rev_menu(g_id):
     kb_builder = InlineKeyboardBuilder()
@@ -167,11 +170,11 @@ def chat_menu(user_1_id, hours):
 
 
 def edit_revs_menu(g_id):
-        kb_builder = InlineKeyboardBuilder()
-        kb_builder.button(text='Отзывы', callback_data=f'adm_edit_revs_{g_id}')
+    kb_builder = InlineKeyboardBuilder()
+    kb_builder.button(text='Отзывы', callback_data=f'adm_edit_revs_{g_id}')
 
-        kb_builder.adjust(2)
-        return kb_builder.as_markup(resize_keyboard=True)
+    kb_builder.adjust(2)
+    return kb_builder.as_markup(resize_keyboard=True)
 
 
 def adm_del_rev(rev_id):

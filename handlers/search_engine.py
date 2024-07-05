@@ -1,19 +1,19 @@
 import asyncio
-import random
-from aiogram.types import Message, CallbackQuery, FSInputFile
-from aiogram.filters import CommandStart, Command
-from aiogram import Router, F
-from aiogram.fsm.context import FSMContext
-from datetime import datetime, timedelta
-from config import logger, aiogram_bot
-from keyboards import main_kb
-from database import db
-from states import SearchGirls, UkassaPayment, BuyGirl, ChatConnect, PeopleCount
-from utils import inform_admins, Scheduler
 import json
-from aiogram.types import InputMediaPhoto, InputFile
+import random
+from datetime import datetime, timedelta
+
+from aiogram import Router, F
+from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
+from aiogram.types import Message, CallbackQuery, FSInputFile
 from aiogram.utils.media_group import MediaGroupBuilder
 
+from config import logger, aiogram_bot
+from database import db
+from keyboards import main_kb
+from states import SearchGirls, UkassaPayment, BuyGirl, ChatConnect, PeopleCount
+from utils import inform_admins, Scheduler
 
 router = Router()
 timers = {}
@@ -24,7 +24,7 @@ async def parse_media(path):
 
 
 async def send_chat_request(hours: str, message: Message | CallbackQuery, g_id: int,
-                            state: FSMContext, uid: int,):
+                            state: FSMContext, uid: int, ):
     schd = Scheduler()
     timing = int(hours) * 3600
     await schd.schedule_review(timing=timing, message=message, g_id=g_id)
@@ -219,9 +219,6 @@ async def p_bg_buy(callback: CallbackQuery, state: FSMContext):
                                                f'\n<b>Цена:</b> {g_price} рублей', reply_markup=main_kb.buy_girl(g_id, g_price))
 
 
-
-
-
 @router.callback_query(F.data.startswith('buy_girl_'))
 async def p_bg_buy(call: CallbackQuery, state: FSMContext):
     await call.answer()
@@ -230,7 +227,7 @@ async def p_bg_buy(call: CallbackQuery, state: FSMContext):
     for g in g_data:
         g_price = g['price']
     msg = await call.message.answer(f'<b>Стоимость одного часа:</b> {g_price} рублей.'
-                                        f'\nХотите ли вы,чтобы девушка включила веб-камеру?')
+                                    f'\nХотите ли вы,чтобы девушка включила веб-камеру?')
     mkup = main_kb.web_q(g_price, msg.message_id, g_id)
     await aiogram_bot.edit_message_reply_markup(
         chat_id=call.message.chat.id,
@@ -254,6 +251,7 @@ async def p_bg_web_y(call: CallbackQuery, state: FSMContext):
         message_id=msg.message_id,
         reply_markup=mkup
     )
+
 
 @router.callback_query(F.data.startswith('web_q_n_'))
 async def p_bg_web_n(call: CallbackQuery, state: FSMContext):
@@ -306,7 +304,7 @@ async def p_bg_buy_wppl(message: Message, state: FSMContext):
     await state.update_data(price=ttl_price)
     g_data = await db.get_girls_by_id(int(g_id))
     await message.answer(f'<b>Стоимость одного часа:</b> {ttl_price} рублей'
-                          '\nВведите количество <b>часов (цифра)</b>: ')
+                         '\nВведите количество <b>часов (цифра)</b>: ')
     await state.set_state(BuyGirl.process_req)
 
 
@@ -360,8 +358,6 @@ async def p_buy(message: Message, state: FSMContext):
         await send_chat_request(hours, message, g_id, state, uid)
 
 
-
-
 @router.message(BuyGirl.process_req)
 async def p_buy(message: Message, state: FSMContext):
     await message.answer('Неверно указано количество часов. Это должна быть цифра от 1 до 20.')
@@ -396,9 +392,9 @@ async def p_acc_chat(callback: CallbackQuery, state: FSMContext):
     # user2_state = FSMContext(storage=storage, key=StorageKey(bot_id=aiogram_bot.id, chat_id=user_2_id, user_id=user_2_id))
     await callback.answer()
     await callback.message.edit_text("Вы приняли заявку на чат."
-                                          "\n\n<b>Управление чатом:</b> "
-                                          "\n<b>Проверить оставшееся время чата:</b> /remaining_time"
-                                          "\n<b>Остановить чат:</b> /stop_chat", reply_markup=None)
+                                     "\n\n<b>Управление чатом:</b> "
+                                     "\n<b>Проверить оставшееся время чата:</b> /remaining_time"
+                                     "\n<b>Остановить чат:</b> /stop_chat", reply_markup=None)
     await callback.message.answer('Перейдите на "ссылка дискорда", займите свободную комнату, дождитесь заказчика и переместите его из лобби ожидания')
     await aiogram_bot.send_message(user_1_id, "Пользователь принял вашу заявку. Чат запущен."
                                               "\nВам был начислен бонус: 10 минут чата."
@@ -429,9 +425,6 @@ async def remaining_time_command(message: Message):
             await message.answer("Чат уже завершился.")
     else:
         await message.answer("Нет активного чата.")
-
-
-
 
 
 @router.message(ChatConnect.chatting)

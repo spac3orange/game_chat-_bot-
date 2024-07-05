@@ -42,8 +42,6 @@ async def start_params() -> None:
     await dp.start_polling(aiogram_bot)
 
 
-
-
 async def main():
     task1 = asyncio.create_task(start_params())
     await asyncio.gather(task1)
@@ -56,4 +54,3 @@ if __name__ == '__main__':
         logger.warning('Bot stopped')
     except Exception as e:
         logger.error(e)
-

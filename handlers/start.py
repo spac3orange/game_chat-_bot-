@@ -1,11 +1,12 @@
-from aiogram.types import Message, CallbackQuery, FSInputFile
-from aiogram.filters import CommandStart, Command
 from aiogram import Router, F
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
+from aiogram.types import Message, CallbackQuery, FSInputFile
+
 from config import logger
-from filters.is_admin import IsAdmin
-from keyboards import main_kb
 from database import db
+from keyboards import main_kb
+
 router = Router()
 router.message.filter(
 )

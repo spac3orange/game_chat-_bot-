@@ -1,0 +1,20 @@
+BOT_TOKEN = 7139560518:AAHuRonzbNBbM6NNe9tTmEMWUazk #ТОКЕН БОТА
+ADMIN_ID = 46281319,23251354,132035561 #ID АДМИНИСТРАТОРОВ
+channel_id = -100207096089 #ID канала
+channel_url = https://t.me/ru_emarket #ссылка на канал
+
+t_api = t.BSSmCPD6JW5_0Ud_oi92EFODVF72dOJ1HafpV-N85jCK_n1TWFf9TC5nLTPD10Y-dANiB2nz4CTSH1NuCHGLg # t-bank api-key
+t_key = 1713542175840EMO #t-bank terminal key
+t_pass = ox5i8zpbgdxtbhv #t-bank terminal pass
+
+# База данных PostgreSQL
+DB_USER = postgres
+DB_PASSWORD = kwork113zZ//]
+DB_HOST = localhost
+DB_NAME = game_chat_bot
+DB_PORT = 5432
+
+#не менять
+ek_token = 111111111
+uk_shop_id = 36245
+uk_api = live_7gsJHg5-dEBNUE5EkAc_ziokgGmrlgO_Q59PpkmzoIuk_shop_id = 364245

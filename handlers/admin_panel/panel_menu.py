@@ -1,14 +1,16 @@
-from aiogram.types import Message, CallbackQuery, ContentType
-from aiogram.filters import CommandStart, Command
+import os
+import random
+
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
+from aiogram.types import Message, CallbackQuery, ContentType
+
 from config import logger, aiogram_bot
+from database import db
 from filters.is_admin import IsAdmin
 from keyboards import main_kb
-from database import db
 from states import AdmMailing, EditBot, EnterPromo
-import random
-import os
+
 router = Router()
 router.message.filter(
     IsAdmin(F)

@@ -1,18 +1,17 @@
-from aiogram.types import Message, CallbackQuery, FSInputFile
-from aiogram.filters import CommandStart, Command
+import random
+
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from config import logger
-from filters.is_admin import IsAdmin
-from keyboards import main_kb
+from aiogram.types import Message, CallbackQuery
+
 from database import db
+from keyboards import main_kb
 from states import ProcRev
 from utils import inform_admins
-import random
+
 router = Router()
 router.message.filter(
 )
-
 
 
 async def generate_random_id():

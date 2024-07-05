@@ -1,11 +1,7 @@
-from aiogram.types import Message, CallbackQuery
-from aiogram.filters import CommandStart, Command
-from aiogram import Router, F
-from aiogram.fsm.context import FSMContext
-from config import logger
-from filters.is_admin import IsAdmin
-from keyboards import main_kb
-from database import db
+from aiogram import Router
+from aiogram.filters import Command
+from aiogram.types import Message
+
 router = Router()
 
 
