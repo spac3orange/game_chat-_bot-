@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="479a878a-88d0-4f44-a91d-b5e79be9937a" name="Changes" comment="v 3.0 final">
       <change afterPath="$PROJECT_DIR$/config/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handlers/search_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/search_engine.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -258,7 +257,31 @@
       <option name="project" value="LOCAL" />
       <updated>1720177014889</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="v 3.0 final">
+      <option name="closed" value="true" />
+      <created>1720177430026</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1720177430026</updated>
+    </task>
+    <task id="LOCAL-00011" summary="v 3.0 final">
+      <option name="closed" value="true" />
+      <created>1720177589659</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1720177589659</updated>
+    </task>
+    <task id="LOCAL-00012" summary="v 3.0 final">
+      <option name="closed" value="true" />
+      <created>1720177706078</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1720177706078</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

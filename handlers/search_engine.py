@@ -380,6 +380,7 @@ async def p_dec_chat(call: CallbackQuery, state: FSMContext):
     await call.message.answer("Вы отменили запрос чата.")
     await aiogram_bot.send_message(user_1_id, "Пользователь отменил запрос на чат.")
     await state.clear()
+    await call.answer()
     await db.set_user_state(user_1_id, 'None')
 
 
