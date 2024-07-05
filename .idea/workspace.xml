@@ -6,7 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="479a878a-88d0-4f44-a91d-b5e79be9937a" name="Changes" comment="v 3.0 final">
       <change afterPath="$PROJECT_DIR$/config/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handlers/search_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/search_engine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/payment/ukassa.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/payment/ukassa.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -281,7 +281,23 @@
       <option name="project" value="LOCAL" />
       <updated>1720177706078</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="v 3.0 final">
+      <option name="closed" value="true" />
+      <created>1720177871222</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1720177871222</updated>
+    </task>
+    <task id="LOCAL-00014" summary="v 3.0 final">
+      <option name="closed" value="true" />
+      <created>1720177948045</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1720177948045</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

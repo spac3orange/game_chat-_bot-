@@ -23,7 +23,7 @@ router = Router()
 env = Env()
 t_token = env('t_api')
 t_password = env('t_pass')
-terminal_key = env('t_key')
+terminal_key = env.str('t_key')
 
 
 async def calculate_price_without_vat(price_with_vat, vat_rate):
