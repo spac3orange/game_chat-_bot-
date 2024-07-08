@@ -11,11 +11,11 @@ def start_btns(uid):
         kb_builder.button(text='Выбрать игру', callback_data='select_game')
         kb_builder.button(text='Личный кабинет', callback_data='user_lk')
         kb_builder.button(text='Админ панель', callback_data='admin_panel')
-        kb_builder.button(text='Тех. Поддержка', url='https://t.me/stepusiks')
+        kb_builder.button(text='Тех. Поддержка', url='https://t.me/egirlforyou')
     else:
         kb_builder.button(text='Выбрать игру', callback_data='select_game')
         kb_builder.button(text='Личный кабинет', callback_data='user_lk')
-        kb_builder.button(text='Тех. Поддержка', url='https://t.me/stepusiks')
+        kb_builder.button(text='Тех. Поддержка', url='https://t.me/egirlforyou')
 
     kb_builder.adjust(2)
     return kb_builder.as_markup(resize_keyboard=True)
@@ -212,8 +212,9 @@ def create_services_keyboard(services=None, g_id=None, h_price=None):
     kb_builder = InlineKeyboardBuilder()
     if services:
         for service in services:
+            print(service)
             button_text = f"{service['service_name']}"
-            callback_data = f"u_add_service_{service['service_name']}_{service['price']}_{g_id}"  # Уникальный идентификатор услуги
+            callback_data = f"u_add_service_{service['s_id']}_{service['price']}_{g_id}"  # Уникальный идентификатор услуги
             kb_builder.button(text=button_text, callback_data=callback_data)
         kb_builder.button(text='Отзывы', callback_data=f'revs_{g_id}')
         kb_builder.button(text='Оплатить', callback_data=f'complete_buy_girl_{h_price}_{g_id}')
@@ -230,7 +231,7 @@ def create_add_services_keyboard(g_id, services, ttl_price, h_price):
     kb_builder = InlineKeyboardBuilder()
     for service in services:
         button_text = f"{service['service_name']}"
-        callback_data = f"u_add_service_{service['service_name']}_{service['price']}_{g_id}"  # Уникальный идентификатор услуги
+        callback_data = f"u_add_service_{service['s_id']}_{service['price']}_{g_id}"  # Уникальный идентификатор услуги
         kb_builder.button(text=button_text, callback_data=callback_data)
     kb_builder.button(text='Отзывы', callback_data=f'revs_{g_id}')
     kb_builder.button(text='Оплатить', callback_data=f'complete_buy_girl_{h_price}_{g_id}_{ttl_price}')

@@ -1,39 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="ANALYZE_INJECTED_CODE" value="false" />
+  </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="479a878a-88d0-4f44-a91d-b5e79be9937a" name="Changes" comment="v 3.0 final">
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+    <list default="true" id="479a878a-88d0-4f44-a91d-b5e79be9937a" name="Changes" comment="v 4.1`">
       <change afterPath="$PROJECT_DIR$/config/.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config/env_example.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/config_aiogram.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/config_aiogram.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/logger.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/logger.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/db_action.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/db_action.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/filters/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/filters/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handlers/admin_panel/edit_descriptions.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/admin_panel/edit_descriptions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handlers/admin_panel/edit_revs.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/admin_panel/edit_revs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handlers/admin_panel/panel_menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/admin_panel/panel_menu.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handlers/game_menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/game_menu.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handlers/payment/promo_code.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/payment/promo_code.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handlers/payment/tinkoff.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/payment/tinkoff.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handlers/payment/ukassa.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/payment/ukassa.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handlers/payment/ukassa_old.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/payment/ukassa_old.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handlers/pop_up_commands.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/pop_up_commands.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handlers/reviews.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/reviews.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handlers/search_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/search_engine.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handlers/start.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/start.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handlers/unknown_command.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/unknown_command.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handlers/user_lk.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/user_lk.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/keyboards/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/keyboards/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/services_menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/services_menu.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/keyboards/main_kb.py" beforeDir="false" afterPath="$PROJECT_DIR$/keyboards/main_kb.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/middlewares/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/middlewares/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/middlewares/check_sub_middleware.py" beforeDir="false" afterPath="$PROJECT_DIR$/middlewares/check_sub_middleware.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/scheduler.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/scheduler.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -352,7 +332,23 @@
       <option name="project" value="LOCAL" />
       <updated>1720183222981</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="v 4.0 cleanup">
+      <option name="closed" value="true" />
+      <created>1720192853562</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1720192853562</updated>
+    </task>
+    <task id="LOCAL-00019" summary="v 4.1`">
+      <option name="closed" value="true" />
+      <created>1720432151331</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1720432151331</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -371,6 +367,8 @@
     <MESSAGE value="v 2.0 final" />
     <MESSAGE value="v 2.1 final" />
     <MESSAGE value="v 3.0 final" />
-    <option name="LAST_COMMIT_MESSAGE" value="v 3.0 final" />
+    <MESSAGE value="v 4.0 cleanup" />
+    <MESSAGE value="v 4.1`" />
+    <option name="LAST_COMMIT_MESSAGE" value="v 4.1`" />
   </component>
 </project>

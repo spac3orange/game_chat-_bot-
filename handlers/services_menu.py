@@ -60,9 +60,10 @@ async def get_girl_data(g_id: int):
 async def p_u_add_serv(call: CallbackQuery, state: FSMContext):
     await call.answer()
     data_split = call.data.split('_')
-    s_name, s_price, g_id = data_split[-3], data_split[-2], data_split[-1]
+    s_id, s_price, g_id = data_split[-3], data_split[-2], data_split[-1]
+    s_name = await db.get_service_name_by_s_id(int(s_id))
     await call.message.edit_text(f'Услуга: {s_name}\n'
-                              f'Стоимость: {s_price}', reply_markup=main_kb.u_choose_serv(s_name, s_price, g_id))
+                                     f'Стоимость: {s_price}', reply_markup=main_kb.u_choose_serv(s_id, s_price, g_id))
     print(s_name, s_price, g_id)
     pass
 
@@ -74,7 +75,8 @@ async def bg_add_serv(call: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     print(data)
     data_split = call.data.split('_')
-    s_name, s_price, g_id = data_split[-3], data_split[-2], int(data_split[-1])
+    s_id, s_price, g_id = data_split[-3], data_split[-2], int(data_split[-1])
+    s_name = await db.get_service_name_by_s_id(int(s_id))
     g_data = await get_girl_data(g_id)
     # Найти первый свободный ключ (serv1, serv2, ...)
     key_index = 1
@@ -96,7 +98,7 @@ async def bg_add_serv(call: CallbackQuery, state: FSMContext):
     total_price = sum(int(service['price']) for service in state_data.values())
     await call.message.edit_text(f'{g_data['data']}'
                                       f'\n\nСписок добавленных услуг: {serv_str}'
-                                      f'\nОбщая стоимость доп. услуг: {total_price} рублей',
+                                      f'\nОбщая стоимость доп. услуг: \n{total_price} рублей',
                                       reply_markup=main_kb.create_add_services_keyboard(g_id, g_services, total_price, g_data['h_price']))
 
 
@@ -115,5 +117,5 @@ async def back_to_add_serv(call: CallbackQuery, state: FSMContext):
     g_services = await db.get_services_by_user_id(g_id)
     await call.message.edit_text(f'{g_data["data"]}'
                                  f'\n\nСписок добавленных услуг: {serv_str}'
-                                 f'\nОбщая стоимость доп. услуг: {total_price} рублей',
+                                 f'\nОбщая стоимость доп. услуг: \n{total_price} рублей',
                                  reply_markup=main_kb.create_add_services_keyboard(g_id, g_services, total_price, g_data['h_price']))

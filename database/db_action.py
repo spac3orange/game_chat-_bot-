@@ -379,7 +379,7 @@ class Database:
 
     async def get_services_by_user_id(self, user_id: int):
         query = """
-            SELECT user_id, username, service_name, price
+            SELECT user_id, username, service_name, price, s_id
             FROM g_services
             WHERE user_id = $1
         """
@@ -389,5 +389,19 @@ class Database:
         except (Exception, asyncpg.PostgresError) as error:
             logger.error(f"Error while getting services for user_id '{user_id}': {error}")
             return []
+
+    async def get_service_name_by_s_id(self, s_id: int):
+        query = """
+            SELECT service_name
+            FROM g_services
+            WHERE s_id = $1
+        """
+        try:
+            result = await self.fetch_row(query, s_id)
+            return result['service_name'] if result else None
+        except (Exception, asyncpg.PostgresError) as error:
+            logger.error(f"Error while getting service name for s_id '{s_id}': {error}")
+            return None
+
 
 db = Database()
