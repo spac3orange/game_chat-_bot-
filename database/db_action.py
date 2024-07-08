@@ -113,7 +113,7 @@ class Database:
         except (Exception, asyncpg.PostgresError) as error:
             logger.error("Error while connecting to DB", error)
 
-    async def set_user_state(self, user_id, state):
+    async def set_user_state(self, user_id: int, state: str):
         user_id = int(user_id)
         query = """
         INSERT INTO user_states (user_id, state) VALUES ($1, $2)
@@ -122,12 +122,12 @@ class Database:
         await self.execute_query(query, user_id, state)
         logger.info(f'State updated for user {user_id} to {state}')
 
-    async def check_user_state(self, user_id, state_to_check):
+    async def check_user_state(self, user_id: int, state_to_check: str):
         current_state = await self.get_user_state(user_id)
         print(current_state)
         return current_state == state_to_check
 
-    async def get_user_state(self, user_id):
+    async def get_user_state(self, user_id: int):
         query = """
         SELECT state FROM user_states WHERE user_id = $1;
         """
@@ -365,7 +365,7 @@ class Database:
         except Exception as e:
             logger.error(f"Error while deleting review {e}")
 
-    async def get_shift_status(self, user_id):
+    async def get_shift_status(self, user_id: int):
         try:
             result = await self.fetch_row(
                 "SELECT * FROM girl_shift WHERE user_id = $1", user_id)
@@ -377,5 +377,17 @@ class Database:
             logger.error("Error retrieving shift status", error)
             return str(error)
 
+    async def get_services_by_user_id(self, user_id: int):
+        query = """
+            SELECT user_id, username, service_name, price
+            FROM g_services
+            WHERE user_id = $1
+        """
+        try:
+            services = await self.fetch_all(query, user_id)
+            return services
+        except (Exception, asyncpg.PostgresError) as error:
+            logger.error(f"Error while getting services for user_id '{user_id}': {error}")
+            return []
 
 db = Database()

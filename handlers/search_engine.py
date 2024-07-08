@@ -2,7 +2,7 @@ import asyncio
 import json
 import random
 from datetime import datetime, timedelta
-
+import base64
 from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
@@ -41,6 +41,9 @@ async def send_chat_request(hours: str, message: Message | CallbackQuery, g_id: 
     print(await state.get_state())
     # Notify User 2 (replace USER_2_ID with the actual user id)
     user2_id = g_id
+    print(uid, user2_id)
+    data = await state.get_data()
+    print(data)
     try:
         await aiogram_bot.send_message(user2_id, f"Пользователь хочет начать чат с вами.",
                                        reply_markup=main_kb.chat_menu(uid, hours))
@@ -135,8 +138,72 @@ async def search_girls(girls: dict, callback: CallbackQuery, stop_event: asyncio
                 album_builder.add_photo(media=FSInputFile(avatar_path))
             if album_builder:
                 await callback.message.answer_media_group(media=album_builder.build())
-                await callback.message.answer(text=data, reply_markup=main_kb.bg_menu(g_id))
+                await callback.message.answer(text=data, reply_markup=main_kb.g_intr_menu(g_id))
             await asyncio.sleep(random.randint(3, 7))
+
+
+async def get_girl_data(g_id: int):
+    girl = await db.get_girls_by_id(g_id)
+    girl = girl[0]
+    avatar_paths = json.loads(girl['avatar_path'])
+    g_status = await db.get_user_state(g_id)
+    g_shift = await db.get_shift_status(g_id)
+
+    # Определение статуса девушки
+    match g_status:
+        case 'ChatConnect:chatting':
+            g_status = 'Занята 🟡'
+        case 'None':
+            g_status = 'Онлайн 🟢'
+
+    # Определение статуса смены
+    match g_shift['shift_status']:
+        case 'Offline':
+            g_status = 'Оффлайн 🔴'
+        case 'Online':
+            if g_status != 'Занята 🟡':
+                g_status = 'Онлайн 🟢'
+
+    g_name, g_age = girl['name'], girl['age']
+    data = (f'<b>{g_name}</b>, {g_age}'
+            f'\n<b>Игры:</b> {girl["games"]}'
+            f'\n<b>О себе:</b> {girl["description"]}'
+            f'\n<b>Час игры: </b> {girl["price"]}'
+            f'\n<b>Статус:</b> {g_status}')
+
+    g_services = await db.get_services_by_user_id(g_id)
+
+    return {
+        'avatar_paths': avatar_paths,
+        'data': data,
+        'services': g_services,
+        'h_price': girl['price']
+    }
+
+
+@router.callback_query(F.data.startswith('g_intr_menu_'))
+async def p_intr_menu(call: CallbackQuery, state: FSMContext):
+    await call.answer()
+    g_id = int(call.data.split('_')[-1])
+    g_info = await get_girl_data(g_id)
+    avatar_paths, g_data, g_serv = g_info['avatar_paths'], g_info['data'], g_info['services']
+    if g_serv:
+        for s in g_serv:
+            print(s['service_name'], s['price'])
+        album_builder = MediaGroupBuilder()
+        for avatar_path in avatar_paths:
+            album_builder.add_photo(media=FSInputFile(avatar_path))
+        if album_builder:
+            await call.message.answer_media_group(media=album_builder.build())
+            await call.message.answer(text=g_data + '\n\nДополнительные услуги: Не выбраны',
+                                      reply_markup=main_kb.create_services_keyboard(g_serv, g_id, g_info['h_price']))
+    else:
+        album_builder = MediaGroupBuilder()
+        for avatar_path in avatar_paths:
+            album_builder.add_photo(media=FSInputFile(avatar_path))
+        if album_builder:
+            await call.message.answer_media_group(media=album_builder.build())
+            await call.message.answer(text=g_data, reply_markup=main_kb.create_services_keyboard(g_id=g_id, h_price=g_info['h_price']))
 
 
 @router.callback_query(F.data.startswith('game_'))
@@ -182,30 +249,29 @@ async def stop_handler(message: Message, state: FSMContext):
         await message.answer('Поиск не запущен.')
         return
 
+# @router.callback_query(F.data.startswith('bg_buy_'))
+# async def p_bg_buy(callback: CallbackQuery, state: FSMContext):
+#     await callback.answer()
+#     g_id = int(callback.data.split('_')[-1])
+#     g_status = await db.check_user_state(g_id, ChatConnect.chatting)
+
 
 @router.callback_query(F.data.startswith('bg_buy_'))
 async def p_bg_buy(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
+    print(callback.data)
     g_id = int(callback.data.split('_')[-1])
-    g_status = await db.check_user_state(g_id, ChatConnect.chatting)
-    if g_status:
+    if await db.check_user_state(g_id, ChatConnect.chatting):
         await callback.message.answer('На данный момент девушка занята. Пожалуйста, попробуйте позднее.')
         return
-    g_shift = await db.get_shift_status(g_id)
-    if g_shift['shift_status'] == 'Offline':
+    if await db.get_shift_status(g_id) == 'Offline':
         await callback.message.answer('На данный момент девушка оффлайн. Пожалуйста, попробуйте позднее.')
         return
     g_data = await db.get_girls_by_id(g_id)
     g_str = ''
     for g in g_data:
-        g_str = (f'<b>{g["name"]}</b>, {g["age"]}'
-                 f'\n<b>Игры:</b> {g["games"]}'
-                 f'\n{g["description"]}'
-                 f'\n<b>Час игры:</b> {g["price"]} ')
-        g_price = g["price"]
-        # g_avatar = await parse_media(g["avatar_path"])
-
         avatar_paths = json.loads(g['avatar_path'])
+        hour_price = g['price']
         print(avatar_paths)
         # Создание альбома медиафайлов
         album_builder = MediaGroupBuilder()
@@ -213,21 +279,16 @@ async def p_bg_buy(callback: CallbackQuery, state: FSMContext):
             album_builder.add_photo(media=FSInputFile(avatar_path))
         if album_builder:
             await callback.message.answer_media_group(media=album_builder.build())
-            await callback.message.answer(text='<b>Выбрана девушка:</b>'
-                                               f'\n{g_str}'
-                                               f'\n\nЧтобы открыть контактные данные девушки для совместной игры, оплатите доступ.'
-                                               f'\n<b>Цена:</b> {g_price} рублей', reply_markup=main_kb.buy_girl(g_id, g_price))
+            await callback.message.answer(text='Какой то текст', reply_markup=main_kb.buy_girl(g_id, hour_price))
+
 
 
 @router.callback_query(F.data.startswith('buy_girl_'))
 async def p_bg_buy(call: CallbackQuery, state: FSMContext):
     await call.answer()
     g_id = call.data.split('_')[-2]
-    g_data = await db.get_girls_by_id(int(g_id))
-    for g in g_data:
-        g_price = g['price']
-    msg = await call.message.answer(f'<b>Стоимость одного часа:</b> {g_price} рублей.'
-                                    f'\nХотите ли вы,чтобы девушка включила веб-камеру?')
+    g_price = call.data.split('_'[-1])
+    msg = await call.message.answer('Введите кол-во часов:')
     mkup = main_kb.web_q(g_price, msg.message_id, g_id)
     await aiogram_bot.edit_message_reply_markup(
         chat_id=call.message.chat.id,
@@ -311,48 +372,95 @@ async def p_bg_buy_wppl(message: Message, state: FSMContext):
 @router.callback_query(F.data.startswith('complete_buy_girl_'))
 async def p_bg_buy(call: CallbackQuery, state: FSMContext):
     await call.answer()
+    print(len(call.data.split('_')))
+    if len(call.data.split('_')) == 6:
+        g_id = int(call.data.split('_')[-2])
+        g_price = call.data.split('_')[-3]
+        g_data = await db.get_girls_by_id(int(g_id))
+        serv_price = call.data.split('_')[-1]
+        print(g_id, g_price, serv_price)
+    else:
+        g_id = int(call.data.split('_')[-1])
+        g_price = call.data.split('_')[-2]
+        serv_price = 0
+        print(g_id, g_price)
+    print(call.data)
+    g_state = await db.get_user_state(g_id)
+    print(g_state)
+    g_status = await db.check_user_state(g_id, ChatConnect.chatting)
+    if g_status:
+        await call.message.answer('На данный момент девушка занята. Пожалуйста, попробуйте позднее.')
+        return
+    g_shift = await db.get_shift_status(g_id)
+    if g_shift['shift_status'] == 'Offline':
+        await call.message.answer('На данный момент девушка оффлайн. Пожалуйста, попробуйте позднее.')
+        return
     await state.set_state(BuyGirl.input_hours)
-    g_id = call.data.split('_')[-1]
-    g_price = call.data.split('_')[-2]
-    await state.update_data(g_id=g_id)
-    await state.update_data(price=g_price)
-    g_data = await db.get_girls_by_id(int(g_id))
 
+    print(g_id, g_price, serv_price)
+    print(123)
+    await state.update_data(g_id=g_id, price=g_price, serv_price=serv_price)
     await call.message.answer(f'<b>Стоимость одного часа:</b> {g_price} рублей'
                               '\nВведите количество <b>часов (цифра)</b>: ')
     await state.set_state(BuyGirl.process_req)
 
 
-@router.message(BuyGirl.process_req, lambda message: message.text.isdigit() and 1 <= int(message.text) <= 20)
+@router.callback_query(F.data.startswith('cbg_noserv_'))
+async def p_bg_buy(call: CallbackQuery, state: FSMContext):
+    await call.answer()
+    data_split = call.data.split('_')
+    g_id = int(data_split[-1])
+    g_status = await db.check_user_state(g_id, ChatConnect.chatting)
+    if g_status:
+        await call.message.answer('На данный момент девушка занята. Пожалуйста, попробуйте позднее.')
+        return
+    g_shift = await db.get_shift_status(g_id)
+    if g_shift['shift_status'] == 'Offline':
+        await call.message.answer('На данный момент девушка оффлайн. Пожалуйста, попробуйте позднее.')
+        return
+    await state.set_state(BuyGirl.input_hours)
+    print(call.data)
+    g_price = data_split[-2]
+    g_data = await db.get_girls_by_id(int(g_id))
+    print(g_id, g_price)
+    await state.update_data(g_id=g_id, price=g_price)
+    await call.message.answer(f'<b>Стоимость одного часа:</b> {g_price} рублей'
+                              '\nВведите количество <b>часов (цифра)</b>: ')
+    await state.set_state(BuyGirl.process_req)
+
+
+@router.message(BuyGirl.process_req, lambda message: message.text.isdigit() and 1 <= int(message.text) <= 12)
 async def p_buy(message: Message, state: FSMContext):
     uid = message.from_user.id
     username = message.from_user.username
     g_data = await state.get_data()
     g_id = g_data["g_id"]
-    g_price = g_data["price"]
+    g_price = int(g_data["price"])
+    serv_price = g_data.get('serv_price', 0)
     hours = message.text
     g_price = int(g_price) * int(hours)
+    ttl_price = g_price + int(serv_price)
     user_balance = await db.get_user_balance(uid)
-    if user_balance < g_price:
+    if user_balance < ttl_price:
         await message.answer('На вашем балансе <b>недостаточно средств</b>.'
                              f'\n<b>Баланс: </b> {user_balance} руб.'
-                             f'\n<b>Стоимость услуги: </b> {g_price} руб.',
-                             reply_markup=main_kb.buy_girl_fxd(g_id, g_price, hours))
+                             f'\n<b>Общая стоимость: </b> {ttl_price} руб.',
+                             reply_markup=main_kb.buy_girl_fxd(g_id, ttl_price, hours))
         await state.clear()
     else:
         g_data = await db.get_girls_by_id(int(g_id))
-        girl_payment = (67 / 100) * g_price
+        girl_payment = (67 / 100) * ttl_price
         logger.info(f'girl payment" {girl_payment}')
-        await db.withdraw_from_balance(uid, g_price)
+        await db.withdraw_from_balance(uid, ttl_price)
         await db.top_up_girl_balance(int(g_id), int(girl_payment))
         for g in g_data:
             g_username = g['username']
         await message.answer(f'<b>Вы успешно оплатили доступ.</b> '
-                             f'\nС вашего баланса списано <b>{g_price} руб.</b>.'
-                             f'\n\nПолучено <b>{hours}</b> игрового времени с <b>@{g_username}</b>'
+                             f'\nС вашего баланса списано <b>{ttl_price} руб.</b>.'
+                             f'\n\nПолучено <b>{hours}</b> часов игрового времени'
                              '\n<b>Приятной игры!</b>')
 
-        adm_text = f'Пользователь {username} оплатил доступ к девушке {g_username}. Сумма: {g_price} руб.'
+        adm_text = f'Пользователь {username} оплатил доступ к девушке {g_username}. Сумма: {ttl_price} руб.'
         await inform_admins(adm_text)
         await state.clear()
         await send_chat_request(hours, message, g_id, state, uid)
@@ -370,9 +478,7 @@ async def p_cbg(callback: CallbackQuery):
 
 @router.callback_query(F.data.startswith('decline_'))
 async def p_dec_chat(call: CallbackQuery, state: FSMContext):
-    data = await state.get_data()
-    print(f'{data=}')
-    user_1_id = data['user_1']
+    user_1_id = call.data.split('_')[-1]
     await call.message.answer("Вы отменили запрос чата.")
     await aiogram_bot.send_message(user_1_id, "Пользователь отменил запрос на чат.")
     await state.clear()
@@ -478,3 +584,5 @@ async def cancel_timer_command(message: Message):
         await message.answer("Таймер был успешно отменен.")
     else:
         await message.answer("Нет активного таймера для отмены.")
+
+

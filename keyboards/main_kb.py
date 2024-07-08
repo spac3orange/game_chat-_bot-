@@ -76,6 +76,13 @@ def bg_menu(g_id):
     return kb_builder.as_markup(resize_keyboard=True)
 
 
+def g_intr_menu(g_id):
+    kb_builder = InlineKeyboardBuilder()
+    kb_builder.button(text='Подробнее', callback_data=f'g_intr_menu_{g_id}')
+    kb_builder.adjust(1)
+    return kb_builder.as_markup(resize_keyboard=True)
+
+
 def sg_btn():
     buttons = [
         [KeyboardButton(text='Остановить поиск', callback_data='stop')]
@@ -86,7 +93,7 @@ def sg_btn():
 
 def buy_girl(g_id, price):
     kb_builder = InlineKeyboardBuilder()
-    kb_builder.button(text='Подтвердить', callback_data=f'buy_girl_{g_id}_{price}')
+    kb_builder.button(text='Подтвердить', callback_data=f'complete_buy_girl_{g_id}_{price}')
     kb_builder.button(text='Отмена', callback_data=f'cancel_buy_girl')
 
     kb_builder.adjust(1)
@@ -199,3 +206,42 @@ def alone_q(g_price, message_id, g_id):
     kb_builder.button(text='Нет', callback_data=f'alone_q_n_{message_id}_{g_price}_{g_id}')
     kb_builder.adjust(2)
     return kb_builder.as_markup(resize_keyboard=True)
+
+
+def create_services_keyboard(services=None, g_id=None, h_price=None):
+    kb_builder = InlineKeyboardBuilder()
+    if services:
+        for service in services:
+            button_text = f"{service['service_name']}"
+            callback_data = f"u_add_service_{service['service_name']}_{service['price']}_{g_id}"  # Уникальный идентификатор услуги
+            kb_builder.button(text=button_text, callback_data=callback_data)
+        kb_builder.button(text='Отзывы', callback_data=f'revs_{g_id}')
+        kb_builder.button(text='Оплатить', callback_data=f'complete_buy_girl_{h_price}_{g_id}')
+        kb_builder.adjust(2)
+        return kb_builder.as_markup(resize_keyboard=True)
+    else:
+        kb_builder.button(text='Отзывы', callback_data=f'revs_{g_id}')
+        kb_builder.button(text='Оплатить', callback_data=f'cbg_noserv_{h_price}_{g_id}')
+        kb_builder.adjust(2)
+        return kb_builder.as_markup(resize_keyboard=True)
+
+
+def create_add_services_keyboard(g_id, services, ttl_price, h_price):
+    kb_builder = InlineKeyboardBuilder()
+    for service in services:
+        button_text = f"{service['service_name']}"
+        callback_data = f"u_add_service_{service['service_name']}_{service['price']}_{g_id}"  # Уникальный идентификатор услуги
+        kb_builder.button(text=button_text, callback_data=callback_data)
+    kb_builder.button(text='Отзывы', callback_data=f'revs_{g_id}')
+    kb_builder.button(text='Оплатить', callback_data=f'complete_buy_girl_{h_price}_{g_id}_{ttl_price}')
+    kb_builder.adjust(2)
+    return kb_builder.as_markup(resize_keyboard=True)
+
+
+def u_choose_serv(s_name, s_price, g_id):
+    kb_builder = InlineKeyboardBuilder()
+    kb_builder.button(text='Добавить', callback_data=f'bg_add_serv_{s_name}_{s_price}_{g_id}')
+    kb_builder.button(text='Назад', callback_data=f'back_to_add_serv_{g_id}')
+    kb_builder.adjust(2)
+    return kb_builder.as_markup(resize_keyboard=True)
+

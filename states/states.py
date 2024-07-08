@@ -44,3 +44,7 @@ class ChatConnect(StatesGroup):
 
 class PeopleCount(StatesGroup):
     input_ppl = State()
+
+
+class AddService(StatesGroup):
+    input_service = State()
