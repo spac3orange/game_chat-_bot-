@@ -8,7 +8,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, FSInputFile
 from aiogram.utils.media_group import MediaGroupBuilder
-
+import magic
 from config import logger, aiogram_bot
 from database import db
 from keyboards import main_kb
@@ -17,6 +17,22 @@ from utils import inform_admins, Scheduler
 
 router = Router()
 timers = {}
+
+
+async def get_mime_type(file_path):
+    mime = magic.Magic(mime=True)
+    mime_type = mime.from_file(file_path)
+    return mime_type
+
+
+async def is_video(file_path):
+    mime_type = await get_mime_type(file_path)
+    return mime_type.startswith('video')
+
+
+async def is_photo(file_path):
+    mime_type = await get_mime_type(file_path)
+    return mime_type.startswith('image')
 
 
 async def parse_media(path):
@@ -135,7 +151,10 @@ async def search_girls(girls: dict, callback: CallbackQuery, stop_event: asyncio
             # Создание альбома медиафайлов
             album_builder = MediaGroupBuilder()
             for avatar_path in avatar_paths:
-                album_builder.add_photo(media=FSInputFile(avatar_path))
+                if await is_video(avatar_path):
+                    album_builder.add_video(media=FSInputFile(avatar_path))
+                elif await is_photo(avatar_path):
+                    album_builder.add_photo(media=FSInputFile(avatar_path))
             if album_builder:
                 await callback.message.answer_media_group(media=album_builder.build())
                 await callback.message.answer(text=data, reply_markup=main_kb.g_intr_menu(g_id))
@@ -192,7 +211,10 @@ async def p_intr_menu(call: CallbackQuery, state: FSMContext):
             print(s['service_name'], s['price'])
         album_builder = MediaGroupBuilder()
         for avatar_path in avatar_paths:
-            album_builder.add_photo(media=FSInputFile(avatar_path))
+            if await is_video(avatar_path):
+                album_builder.add_video(media=FSInputFile(avatar_path))
+            elif await is_photo(avatar_path):
+                album_builder.add_photo(media=FSInputFile(avatar_path))
         if album_builder:
             await call.message.answer_media_group(media=album_builder.build())
             await call.message.answer(text=g_data + '\n\nДополнительные услуги: Не выбраны',
@@ -200,7 +222,10 @@ async def p_intr_menu(call: CallbackQuery, state: FSMContext):
     else:
         album_builder = MediaGroupBuilder()
         for avatar_path in avatar_paths:
-            album_builder.add_photo(media=FSInputFile(avatar_path))
+            if await is_video(avatar_path):
+                album_builder.add_video(media=FSInputFile(avatar_path))
+            elif await is_photo(avatar_path):
+                album_builder.add_photo(media=FSInputFile(avatar_path))
         if album_builder:
             await call.message.answer_media_group(media=album_builder.build())
             await call.message.answer(text=g_data, reply_markup=main_kb.create_services_keyboard(g_id=g_id, h_price=g_info['h_price']))
@@ -276,7 +301,10 @@ async def p_bg_buy(callback: CallbackQuery, state: FSMContext):
         # Создание альбома медиафайлов
         album_builder = MediaGroupBuilder()
         for avatar_path in avatar_paths:
-            album_builder.add_photo(media=FSInputFile(avatar_path))
+            if await is_video(avatar_path):
+                album_builder.add_video(media=FSInputFile(avatar_path))
+            elif await is_photo(avatar_path):
+                album_builder.add_photo(media=FSInputFile(avatar_path))
         if album_builder:
             await callback.message.answer_media_group(media=album_builder.build())
             await callback.message.answer(text='Какой то текст', reply_markup=main_kb.buy_girl(g_id, hour_price))
