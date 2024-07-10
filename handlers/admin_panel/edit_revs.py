@@ -32,8 +32,7 @@ async def p_edit_revs(callback: CallbackQuery):
             g_name, g_age = girl['name'], girl['age']
             data = (f'<b>{g_name}</b>, {g_age}'
                     f'\n<b>Игры:</b> {girl["games"]}'
-                    f'f\n<b>О себе:</b> {girl["description"]}'
-                    f'\n<b>Час игры: </b> {girl["price"]}')
+                    f'f\n<b>О себе:</b> {girl["description"]}')
             avatar_paths = json.loads(girl['avatar_path'])
             print(avatar_paths)
             # Создание альбома медиафайлов

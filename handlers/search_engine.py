@@ -41,8 +41,13 @@ async def parse_media(path):
 
 async def send_chat_request(hours: str, message: Message | CallbackQuery, g_id: int,
                             state: FSMContext, uid: int, ):
+    print(f'{hours=}')
+    if int(hours) == 0:
+        timing = 30 * 60
+    else:
+        timing = int(hours) * 3600
     schd = Scheduler()
-    timing = int(hours) * 3600
+    print(f'schd timing {timing}')
     await schd.schedule_review(timing=timing, message=message, g_id=g_id)
     # await state.update_data(self_id=uid)
     if isinstance(message, Message):
@@ -113,8 +118,8 @@ async def p_select_game(callback: CallbackQuery):
 
 
 async def search_girls(girls: dict, callback: CallbackQuery, stop_event: asyncio.Event):
+    await aiogram_bot.send_chat_action(callback.message.chat.id, 'typing')
     for girl in girls:
-        await aiogram_bot.send_chat_action(callback.message.chat.id, 'typing')
         if not stop_event.is_set():
             g_id = int(girl['user_id'])
             g_status = await db.get_user_state(g_id)
@@ -144,7 +149,6 @@ async def search_girls(girls: dict, callback: CallbackQuery, stop_event: asyncio
             data = (f'<b>{g_name}</b>, {g_age}'
                     f'\n<b>Игры:</b> {girl["games"]}'
                     f'\n<b>О себе:</b> {girl["description"]}'
-                    f'\n<b>Час игры: </b> {girl["price"]}'
                     f'\n<b>Статус:</b> {g_status}')
             avatar_paths = json.loads(girl['avatar_path'])
             print(avatar_paths)
@@ -187,7 +191,6 @@ async def get_girl_data(g_id: int):
     data = (f'<b>{g_name}</b>, {g_age}'
             f'\n<b>Игры:</b> {girl["games"]}'
             f'\n<b>О себе:</b> {girl["description"]}'
-            f'\n<b>Час игры: </b> {girl["price"]}'
             f'\n<b>Статус:</b> {g_status}')
 
     g_services = await db.get_services_by_user_id(g_id)
@@ -209,6 +212,7 @@ async def p_intr_menu(call: CallbackQuery, state: FSMContext):
     if g_serv:
         for s in g_serv:
             print(s['service_name'], s['price'])
+
         album_builder = MediaGroupBuilder()
         for avatar_path in avatar_paths:
             if await is_video(avatar_path):
@@ -280,82 +284,82 @@ async def stop_handler(message: Message, state: FSMContext):
 #     g_id = int(callback.data.split('_')[-1])
 #     g_status = await db.check_user_state(g_id, ChatConnect.chatting)
 
-
-@router.callback_query(F.data.startswith('bg_buy_'))
-async def p_bg_buy(callback: CallbackQuery, state: FSMContext):
-    await callback.answer()
-    print(callback.data)
-    g_id = int(callback.data.split('_')[-1])
-    if await db.check_user_state(g_id, ChatConnect.chatting):
-        await callback.message.answer('На данный момент девушка занята. Пожалуйста, попробуйте позднее.')
-        return
-    if await db.get_shift_status(g_id) == 'Offline':
-        await callback.message.answer('На данный момент девушка оффлайн. Пожалуйста, попробуйте позднее.')
-        return
-    g_data = await db.get_girls_by_id(g_id)
-    g_str = ''
-    for g in g_data:
-        avatar_paths = json.loads(g['avatar_path'])
-        hour_price = g['price']
-        print(avatar_paths)
-        # Создание альбома медиафайлов
-        album_builder = MediaGroupBuilder()
-        for avatar_path in avatar_paths:
-            if await is_video(avatar_path):
-                album_builder.add_video(media=FSInputFile(avatar_path))
-            elif await is_photo(avatar_path):
-                album_builder.add_photo(media=FSInputFile(avatar_path))
-        if album_builder:
-            await callback.message.answer_media_group(media=album_builder.build())
-            await callback.message.answer(text='Какой то текст', reply_markup=main_kb.buy_girl(g_id, hour_price))
-
-
-
-@router.callback_query(F.data.startswith('buy_girl_'))
-async def p_bg_buy(call: CallbackQuery, state: FSMContext):
-    await call.answer()
-    g_id = call.data.split('_')[-2]
-    g_price = call.data.split('_'[-1])
-    msg = await call.message.answer('Введите кол-во часов:')
-    mkup = main_kb.web_q(g_price, msg.message_id, g_id)
-    await aiogram_bot.edit_message_reply_markup(
-        chat_id=call.message.chat.id,
-        message_id=msg.message_id,
-        reply_markup=mkup
-    )
+#
+# @router.callback_query(F.data.startswith('bg_buy_'))
+# async def p_bg_buy(callback: CallbackQuery, state: FSMContext):
+#     await callback.answer()
+#     print(callback.data)
+#     g_id = int(callback.data.split('_')[-1])
+#     if await db.check_user_state(g_id, ChatConnect.chatting):
+#         await callback.message.answer('На данный момент девушка занята. Пожалуйста, попробуйте позднее.')
+#         return
+#     if await db.get_shift_status(g_id) == 'Offline':
+#         await callback.message.answer('На данный момент девушка оффлайн. Пожалуйста, попробуйте позднее.')
+#         return
+#     g_data = await db.get_girls_by_id(g_id)
+#     g_str = ''
+#     for g in g_data:
+#         avatar_paths = json.loads(g['avatar_path'])
+#         hour_price = g['price']
+#         print(avatar_paths)
+#         # Создание альбома медиафайлов
+#         album_builder = MediaGroupBuilder()
+#         for avatar_path in avatar_paths:
+#             if await is_video(avatar_path):
+#                 album_builder.add_video(media=FSInputFile(avatar_path))
+#             elif await is_photo(avatar_path):
+#                 album_builder.add_photo(media=FSInputFile(avatar_path))
+#         if album_builder:
+#             await callback.message.answer_media_group(media=album_builder.build())
+#             await callback.message.answer(text='Какой то текст', reply_markup=main_kb.buy_girl(g_id, hour_price))
 
 
-@router.callback_query(F.data.startswith('web_q_y_'))
-async def p_bg_web_y(call: CallbackQuery, state: FSMContext):
-    await call.answer()
-    g_id = call.data.split('_')[-1]
-    g_price = int(call.data.split('_')[-2]) + 200
 
-    del_mes = call.data.split('_')[-3]
-    await aiogram_bot.delete_message(call.message.chat.id, int(del_mes))
-    msg = await call.message.answer(f'<b>Стоимость одного часа:</b> {g_price} рублей.\nВы будете один?')
-    mkup = main_kb.alone_q(g_price, msg.message_id, g_id)
-    await aiogram_bot.edit_message_reply_markup(
-        chat_id=call.message.chat.id,
-        message_id=msg.message_id,
-        reply_markup=mkup
-    )
+# @router.callback_query(F.data.startswith('buy_girl_'))
+# async def p_bg_buy(call: CallbackQuery, state: FSMContext):
+#     await call.answer()
+#     g_id = call.data.split('_')[-2]
+#     g_price = call.data.split('_'[-1])
+#     msg = await call.message.answer('Введите кол-во часов:')
+#     mkup = main_kb.web_q(g_price, msg.message_id, g_id)
+#     await aiogram_bot.edit_message_reply_markup(
+#         chat_id=call.message.chat.id,
+#         message_id=msg.message_id,
+#         reply_markup=mkup
+#     )
 
 
-@router.callback_query(F.data.startswith('web_q_n_'))
-async def p_bg_web_n(call: CallbackQuery, state: FSMContext):
-    await call.answer()
-    g_id = call.data.split('_')[-1]
-    g_price = int(call.data.split('_')[-2])
-    del_mes = call.data.split('_')[-3]
-    await aiogram_bot.delete_message(call.message.chat.id, int(del_mes))
-    msg = await call.message.answer(f'<b>Стоимость одного часа:</b> {g_price} рублей.\nВы будете один?')
-    mkup = main_kb.alone_q(g_price, msg.message_id, g_id)
-    await aiogram_bot.edit_message_reply_markup(
-        chat_id=call.message.chat.id,
-        message_id=msg.message_id,
-        reply_markup=mkup
-    )
+# @router.callback_query(F.data.startswith('web_q_y_'))
+# async def p_bg_web_y(call: CallbackQuery, state: FSMContext):
+#     await call.answer()
+#     g_id = call.data.split('_')[-1]
+#     g_price = int(call.data.split('_')[-2]) + 200
+#
+#     del_mes = call.data.split('_')[-3]
+#     await aiogram_bot.delete_message(call.message.chat.id, int(del_mes))
+#     msg = await call.message.answer(f'<b>Стоимость одного часа:</b> {g_price} рублей.\nВы будете один?')
+#     mkup = main_kb.alone_q(g_price, msg.message_id, g_id)
+#     await aiogram_bot.edit_message_reply_markup(
+#         chat_id=call.message.chat.id,
+#         message_id=msg.message_id,
+#         reply_markup=mkup
+#     )
+
+
+# @router.callback_query(F.data.startswith('web_q_n_'))
+# async def p_bg_web_n(call: CallbackQuery, state: FSMContext):
+#     await call.answer()
+#     g_id = call.data.split('_')[-1]
+#     g_price = int(call.data.split('_')[-2])
+#     del_mes = call.data.split('_')[-3]
+#     await aiogram_bot.delete_message(call.message.chat.id, int(del_mes))
+#     msg = await call.message.answer(f'<b>Стоимость одного часа:</b> {g_price} рублей.\nВы будете один?')
+#     mkup = main_kb.alone_q(g_price, msg.message_id, g_id)
+#     await aiogram_bot.edit_message_reply_markup(
+#         chat_id=call.message.chat.id,
+#         message_id=msg.message_id,
+#         reply_markup=mkup
+#     )
 
 
 # @router.callback_query(F.data.startswith('alone_q_y_'))
@@ -369,49 +373,55 @@ async def p_bg_web_n(call: CallbackQuery, state: FSMContext):
 #
 #
 #
-@router.callback_query(F.data.startswith('alone_q_n_'))
-async def p_alone_q_n(call: CallbackQuery, state: FSMContext):
-    await call.answer()
-    g_id = call.data.split('_')[-1]
-    g_price = int(call.data.split('_')[-2])
-    del_mes = call.data.split('_')[-3]
-    await aiogram_bot.delete_message(call.message.chat.id, int(del_mes))
-    msg = await call.message.answer(f'Сколько будет людей?')
-    await state.set_state(PeopleCount.input_ppl)
-    await state.update_data(g_id=g_id, g_price=g_price, msg=msg)
+# @router.callback_query(F.data.startswith('alone_q_n_'))
+# async def p_alone_q_n(call: CallbackQuery, state: FSMContext):
+#     await call.answer()
+#     g_id = call.data.split('_')[-1]
+#     g_price = int(call.data.split('_')[-2])
+#     del_mes = call.data.split('_')[-3]
+#     await aiogram_bot.delete_message(call.message.chat.id, int(del_mes))
+#     msg = await call.message.answer(f'Сколько будет людей?')
+#     await state.set_state(PeopleCount.input_ppl)
+#     await state.update_data(g_id=g_id, g_price=g_price, msg=msg)
 
 
-@router.message(PeopleCount.input_ppl, lambda message: message.text.isdigit() and int(message.text) <= 10)
-async def p_bg_buy_wppl(message: Message, state: FSMContext):
-    ppl = int(message.text)
-    data = await state.get_data()
-    await state.clear()
-    ttl_price = int(data['g_price']) + ppl * 10
-    await state.set_state(BuyGirl.input_hours)
-    g_id = data['g_id']
-    await state.update_data(g_id=g_id)
-    await state.update_data(price=ttl_price)
-    g_data = await db.get_girls_by_id(int(g_id))
-    await message.answer(f'<b>Стоимость одного часа:</b> {ttl_price} рублей'
-                         '\nВведите количество <b>часов (цифра)</b>: ')
-    await state.set_state(BuyGirl.process_req)
+# @router.message(PeopleCount.input_ppl, lambda message: message.text.isdigit() and int(message.text) <= 10)
+# async def p_bg_buy_wppl(message: Message, state: FSMContext):
+#     ppl = int(message.text)
+#     data = await state.get_data()
+#     await state.clear()
+#     ttl_price = int(data['g_price']) + ppl * 10
+#     await state.set_state(BuyGirl.input_hours)
+#     g_id = data['g_id']
+#     await state.update_data(g_id=g_id)
+#     await state.update_data(price=ttl_price)
+#     g_data = await db.get_girls_by_id(int(g_id))
+#     await message.answer(f'<b>Стоимость одного часа:</b> {ttl_price} рублей'
+#                          '\nВведите количество <b>часов (цифра)</b>: ')
+#     await state.set_state(BuyGirl.process_req)
+
 
 
 @router.callback_query(F.data.startswith('complete_buy_girl_'))
 async def p_bg_buy(call: CallbackQuery, state: FSMContext):
+    # action after payment button pressed with servs
+    print('serv_handler')
     await call.answer()
     print(len(call.data.split('_')))
-    if len(call.data.split('_')) == 6:
+    if len(call.data.split('_')) == 7:
         g_id = int(call.data.split('_')[-2])
         g_price = call.data.split('_')[-3]
         g_data = await db.get_girls_by_id(int(g_id))
         serv_price = call.data.split('_')[-1]
+        ttl_hours = call.data.split('_')[-4]
         print(g_id, g_price, serv_price)
     else:
         g_id = int(call.data.split('_')[-1])
         g_price = call.data.split('_')[-2]
         serv_price = 0
         print(g_id, g_price)
+        await call.message.answer('Пожалуйста, сначала выберите услуги')
+        return
     print(call.data)
     g_state = await db.get_user_state(g_id)
     print(g_state)
@@ -423,18 +433,18 @@ async def p_bg_buy(call: CallbackQuery, state: FSMContext):
     if g_shift['shift_status'] == 'Offline':
         await call.message.answer('На данный момент девушка оффлайн. Пожалуйста, попробуйте позднее.')
         return
-    await state.set_state(BuyGirl.input_hours)
+    await state.set_state(BuyGirl.web_q)
 
     print(g_id, g_price, serv_price)
-    print(123)
-    await state.update_data(g_id=g_id, price=g_price, serv_price=serv_price)
-    await call.message.answer(f'<b>Стоимость одного часа:</b> {g_price} рублей'
-                              '\nВведите количество <b>часов (цифра)</b>: ')
-    await state.set_state(BuyGirl.process_req)
+    await state.update_data(g_id=g_id, price=g_price, serv_price=serv_price, ttl_hours=ttl_hours)
+    await call.message.answer(f'Хотите ли вы, чтобы девушка включила веб-камеру?'
+                              f'\nСтоимость услуги: {g_price} рублей', reply_markup=main_kb.u_webcam_req())
 
 
 @router.callback_query(F.data.startswith('cbg_noserv_'))
 async def p_bg_buy(call: CallbackQuery, state: FSMContext):
+    # action after payment button pressed with no additional services
+    print('noserv_handler')
     await call.answer()
     data_split = call.data.split('_')
     g_id = int(data_split[-1])
@@ -446,34 +456,42 @@ async def p_bg_buy(call: CallbackQuery, state: FSMContext):
     if g_shift['shift_status'] == 'Offline':
         await call.message.answer('На данный момент девушка оффлайн. Пожалуйста, попробуйте позднее.')
         return
-    await state.set_state(BuyGirl.input_hours)
+    await state.set_state(BuyGirl.web_q)
     print(call.data)
     g_price = data_split[-2]
     g_data = await db.get_girls_by_id(int(g_id))
     print(g_id, g_price)
     await state.update_data(g_id=g_id, price=g_price)
-    await call.message.answer(f'<b>Стоимость одного часа:</b> {g_price} рублей'
-                              '\nВведите количество <b>часов (цифра)</b>: ')
-    await state.set_state(BuyGirl.process_req)
+    await call.message.answer(f'Хотите ли вы, чтобы девушка включила веб-камеру?'
+                              f'\nСтоимость услуги: {g_price} рублей', reply_markup=main_kb.u_webcam_req())
 
 
 @router.message(BuyGirl.process_req, lambda message: message.text.isdigit() and 1 <= int(message.text) <= 12)
 async def p_buy(message: Message, state: FSMContext):
+    ppl_cnt = int(message.text)
+    await state.update_data(ppl_cnt=ppl_cnt)
+    g_data = await state.get_data()
+    ttl_ppl_price = int(g_data['price_per_ppl']) * ppl_cnt
+    ttl_hours = g_data['ttl_hours']
     uid = message.from_user.id
     username = message.from_user.username
-    g_data = await state.get_data()
+    print(g_data)
     g_id = g_data["g_id"]
-    g_price = int(g_data["price"])
+    web_price = int(g_data["price"])
     serv_price = g_data.get('serv_price', 0)
-    hours = message.text
-    g_price = int(g_price) * int(hours)
-    ttl_price = g_price + int(serv_price)
+    hours = 0
+    g_price = 0
+    if g_data['webcam'] == 'yes':
+        ttl_price = g_price + int(serv_price) + ttl_ppl_price + int(web_price)
+    else:
+        ttl_price = g_price + int(serv_price) + ttl_ppl_price
     user_balance = await db.get_user_balance(uid)
+    print('ttl price', ttl_price)
     if user_balance < ttl_price:
         await message.answer('На вашем балансе <b>недостаточно средств</b>.'
                              f'\n<b>Баланс: </b> {user_balance} руб.'
                              f'\n<b>Общая стоимость: </b> {ttl_price} руб.',
-                             reply_markup=main_kb.buy_girl_fxd(g_id, ttl_price, hours))
+                             reply_markup=main_kb.buy_girl_fxd(g_id, ttl_price, ttl_hours))
         await state.clear()
     else:
         g_data = await db.get_girls_by_id(int(g_id))
@@ -484,19 +502,100 @@ async def p_buy(message: Message, state: FSMContext):
         for g in g_data:
             g_username = g['username']
         await message.answer(f'<b>Вы успешно оплатили доступ.</b> '
-                             f'\nС вашего баланса списано <b>{ttl_price} руб.</b>.'
-                             f'\n\nПолучено <b>{hours}</b> часов игрового времени'
+                             f'\nС вашего баланса списано <b>{ttl_price} руб</b>.'
+                             f'\n\nПолучено <b>{ttl_hours}</b> часов игрового времени'
                              '\n<b>Приятной игры!</b>')
 
         adm_text = f'Пользователь {username} оплатил доступ к девушке {g_username}. Сумма: {ttl_price} руб.'
         await inform_admins(adm_text)
         await state.clear()
-        await send_chat_request(hours, message, g_id, state, uid)
+        await send_chat_request(ttl_hours, message, g_id, state, uid)
 
 
-@router.message(BuyGirl.process_req)
-async def p_buy(message: Message, state: FSMContext):
-    await message.answer('Неверно указано количество часов. Это должна быть цифра от 1 до 20.')
+@router.callback_query(F.data.startswith('webcam_req_y_'))
+async def p_webcam_y(call: CallbackQuery, state: FSMContext):
+    await call.answer()
+    await state.update_data(webcam='yes')
+    await call.message.edit_text('Вы будете один?', reply_markup=main_kb.additional_part_req())
+
+
+@router.callback_query(F.data.startswith('webcam_req_n_'))
+async def p_webcam_n(call: CallbackQuery, state: FSMContext):
+    await call.answer()
+    await state.update_data(webcam='no')
+    await call.message.edit_text('Вы будете один?', reply_markup=main_kb.additional_part_req())
+
+
+@router.callback_query(F.data.startswith('add_part_req_n_'))
+async def p_alone_q_n(call: CallbackQuery, state: FSMContext):
+    await call.answer()
+    data = await state.get_data()
+    print(data)
+    g_data = await db.get_girls_by_id(int(data["g_id"]))
+    price_per_ppl = 0
+    for r in g_data:
+        price_per_ppl = r['price_per_ppl']
+    await state.set_state(BuyGirl.process_req)
+    await state.update_data(price_per_ppl=price_per_ppl)
+    await call.message.edit_text(f'Стоимость услуги: {price_per_ppl} рублей за человека.'
+                              f'\nПожалуйста, введите количество людей:')
+
+
+@router.message(BuyGirl.alone_q, lambda message: message.text.isdigit() and 0 < int(message.text) < 20)
+async def p_alone_q_n(message: Message, state: FSMContext):
+    ppl_cnt = int(message.text)
+    await state.update_data(ppl_cnt=ppl_cnt)
+
+
+@router.message(BuyGirl.alone_q, lambda message: message.text.isdigit() and 0 < int(message.text) < 20)
+async def p_alone_q_y(message: Message, state: FSMContext):
+    await message.answer('Неверно указано кол-во людей. Это может быть цифра от 1 до 20.')
+    return
+
+
+@router.callback_query(F.data.startswith('add_part_req_y_'))
+async def p_alone_q_n(call: CallbackQuery, state: FSMContext):
+    await call.answer()
+    g_data = await state.get_data()
+    uid = call.from_user.id
+    username = call.message.from_user.username
+    print(g_data)
+    g_id = g_data["g_id"]
+    web_price = int(g_data["price"])
+    serv_price = g_data.get('serv_price', 0)
+    ttl_hours = g_data['ttl_hours']
+    hours = '0'
+    g_price = 0
+    if g_data['webcam'] == 'yes':
+        ttl_price = g_price + int(serv_price) + int(web_price)
+    else:
+        ttl_price = g_price + int(serv_price)
+    user_balance = await db.get_user_balance(uid)
+    print(user_balance)
+    print('ttl_price', ttl_price)
+    if user_balance < ttl_price:
+        await call.message.edit_text('На вашем балансе <b>недостаточно средств</b>.'
+                             f'\n<b>Баланс: </b> {user_balance} руб.'
+                             f'\n<b>Общая стоимость: </b> {ttl_price} руб.',
+                             reply_markup=main_kb.buy_girl_fxd(g_id, ttl_price, ttl_hours))
+        await state.clear()
+    else:
+        g_data = await db.get_girls_by_id(int(g_id))
+        girl_payment = (67 / 100) * ttl_price
+        logger.info(f'girl payment" {girl_payment}')
+        await db.withdraw_from_balance(uid, ttl_price)
+        await db.top_up_girl_balance(int(g_id), int(girl_payment))
+        for g in g_data:
+            g_username = g['username']
+        await call.message.edit_text(f'<b>Вы успешно оплатили доступ.</b> '
+                             f'\nС вашего баланса списано <b>{ttl_price} руб</b>.'
+                             f'\n\nПолучено <b>{ttl_hours}</b> часов игрового времени'
+                             '\n<b>Приятной игры!</b>')
+
+        adm_text = f'Пользователь {username} оплатил доступ к девушке {g_username}. Сумма: {ttl_price} руб.'
+        await inform_admins(adm_text)
+        await state.clear()
+        await send_chat_request(ttl_hours, call, g_id, state, uid)
 
 
 @router.callback_query(F.data == 'cancel_buy_girl')

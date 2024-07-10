@@ -43,7 +43,6 @@ async def get_girl_data(g_id: int):
     data = (f'<b>{g_name}</b>, {g_age}'
             f'\n<b>Игры:</b> {girl["games"]}'
             f'\n<b>О себе:</b> {girl["description"]}'
-            f'\n<b>Час игры: </b> {girl["price"]}'
             f'\n<b>Статус:</b> {g_status}')
 
     g_services = await db.get_services_by_user_id(g_id)
@@ -96,10 +95,13 @@ async def bg_add_serv(call: CallbackQuery, state: FSMContext):
         if isinstance(v, dict) and 'name' in v and 'price' in v:
             serv_str += f'\n{v["name"]}'
     total_price = sum(int(service['price']) for service in state_data.values())
+    ttl_hours = serv_str.count('1 час')
+    print(ttl_hours)
     await call.message.edit_text(f'{g_data['data']}'
                                       f'\n\nСписок добавленных услуг: {serv_str}'
-                                      f'\nОбщая стоимость доп. услуг: \n{total_price} рублей',
-                                      reply_markup=main_kb.create_add_services_keyboard(g_id, g_services, total_price, g_data['h_price']))
+                                      f'\n\nОбщая стоимость доп. услуг: \n{total_price} рублей',
+                                      reply_markup=main_kb.create_add_services_keyboard(g_id, g_services,
+                                                                                        total_price, g_data['h_price'], ttl_hours))
 
 
 @router.callback_query(F.data.startswith('back_to_add_serv_'))
@@ -114,8 +116,10 @@ async def back_to_add_serv(call: CallbackQuery, state: FSMContext):
         if isinstance(v, dict) and 'name' in v and 'price' in v:
             serv_str += f'\n{v["name"]}'
     total_price = sum(int(service['price']) for service in state_data.values())
+    ttl_hours = serv_str.count('1 час')
+    print(ttl_hours)
     g_services = await db.get_services_by_user_id(g_id)
     await call.message.edit_text(f'{g_data["data"]}'
                                  f'\n\nСписок добавленных услуг: {serv_str}'
-                                 f'\nОбщая стоимость доп. услуг: \n{total_price} рублей',
+                                 f'\n\nОбщая стоимость доп. услуг: \n{total_price} рублей',
                                  reply_markup=main_kb.create_add_services_keyboard(g_id, g_services, total_price, g_data['h_price']))

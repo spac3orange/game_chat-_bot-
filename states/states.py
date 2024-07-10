@@ -30,6 +30,8 @@ class EnterPromo(StatesGroup):
 class BuyGirl(StatesGroup):
     input_hours = State()
     process_req = State()
+    web_q = State()
+    alone_q = State()
 
 
 class ProcRev(StatesGroup):

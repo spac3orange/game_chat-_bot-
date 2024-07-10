@@ -168,6 +168,7 @@ async def p_add_balance(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data.startswith('add_fxd_balance_'))
 async def p_add_balance(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
+    print(callback.data)
     amount = callback.data.split('_')[-1]
     g_id = int(callback.data.split('_')[-2])
     hours = callback.data.split('_')[-3]
@@ -186,10 +187,10 @@ async def p_add_balance(callback: CallbackQuery, state: FSMContext):
             await callback.message.answer(f'Пополнение баланса на <b>{amount}</b> рублей.', reply_markup=main_kb.pay_btns_fxd(payment_id, conf_url, amount, g_id, hours))
             await state.clear()
         else:
-            await callback.message.answer('Произошло ошибка при отправке запроса. Пожалуйста, попробуйте позже.')
+            await callback.message.answer('Произошла ошибка при отправке запроса. Пожалуйста, попробуйте позже.')
     except Exception as e:
         logger.error(e)
-        await callback.message.answer('Произошло ошибка при отправке запроса. Пожалуйста, попробуйте позже.')
+        await callback.message.answer('Произошла ошибка при отправке запроса. Пожалуйста, попробуйте позже.')
         await state.clear()
 
 
@@ -210,10 +211,10 @@ async def p_buy_ukassa(message: Message, bot: aiogram_bot, state: FSMContext):
                                  reply_markup=main_kb.pay_btns(payment_id, conf_url, amount))
             await state.clear()
         else:
-            await message.answer('Произошло ошибка при отправке запроса. Пожалуйста, попробуйте позже.')
+            await message.answer('Произошла ошибка при отправке запроса. Пожалуйста, попробуйте позже.')
     except Exception as e:
         logger.error(e)
-        await message.answer('Произошло ошибка при отправке запроса. Пожалуйста, попробуйте позже.')
+        await message.answer('Произошла ошибка при отправке запроса. Пожалуйста, попробуйте позже.')
         await state.clear()
 
 

@@ -192,20 +192,20 @@ def adm_del_rev(rev_id):
     return kb_builder.as_markup(resize_keyboard=True)
 
 
-def web_q(g_price, message_id, g_id):
-    kb_builder = InlineKeyboardBuilder()
-    kb_builder.button(text='Да', callback_data=f'web_q_y_{message_id}_{g_price}_{g_id}')
-    kb_builder.button(text='Нет', callback_data=f'web_q_n_{message_id}_{g_price}_{g_id}')
-    kb_builder.adjust(2)
-    return kb_builder.as_markup(resize_keyboard=True)
-
-
-def alone_q(g_price, message_id, g_id):
-    kb_builder = InlineKeyboardBuilder()
-    kb_builder.button(text='Да', callback_data=f'complete_buy_girl_{message_id}_{g_price}_{g_id}')
-    kb_builder.button(text='Нет', callback_data=f'alone_q_n_{message_id}_{g_price}_{g_id}')
-    kb_builder.adjust(2)
-    return kb_builder.as_markup(resize_keyboard=True)
+# def web_q(g_price, message_id, g_id):
+#     kb_builder = InlineKeyboardBuilder()
+#     kb_builder.button(text='Да', callback_data=f'web_q_y_{message_id}_{g_price}_{g_id}')
+#     kb_builder.button(text='Нет', callback_data=f'web_q_n_{message_id}_{g_price}_{g_id}')
+#     kb_builder.adjust(2)
+#     return kb_builder.as_markup(resize_keyboard=True)
+#
+#
+# def alone_q(g_price, message_id, g_id):
+#     kb_builder = InlineKeyboardBuilder()
+#     kb_builder.button(text='Да', callback_data=f'complete_buy_girl_{message_id}_{g_price}_{g_id}')
+#     kb_builder.button(text='Нет', callback_data=f'alone_q_n_{message_id}_{g_price}_{g_id}')
+#     kb_builder.adjust(2)
+#     return kb_builder.as_markup(resize_keyboard=True)
 
 
 def create_services_keyboard(services=None, g_id=None, h_price=None):
@@ -227,14 +227,14 @@ def create_services_keyboard(services=None, g_id=None, h_price=None):
         return kb_builder.as_markup(resize_keyboard=True)
 
 
-def create_add_services_keyboard(g_id, services, ttl_price, h_price):
+def create_add_services_keyboard(g_id, services, ttl_price, h_price, ttl_hours):
     kb_builder = InlineKeyboardBuilder()
     for service in services:
         button_text = f"{service['service_name']}"
         callback_data = f"u_add_service_{service['s_id']}_{service['price']}_{g_id}"  # Уникальный идентификатор услуги
         kb_builder.button(text=button_text, callback_data=callback_data)
     kb_builder.button(text='Отзывы', callback_data=f'revs_{g_id}')
-    kb_builder.button(text='Оплатить', callback_data=f'complete_buy_girl_{h_price}_{g_id}_{ttl_price}')
+    kb_builder.button(text='Оплатить', callback_data=f'complete_buy_girl_{ttl_hours}_{h_price}_{g_id}_{ttl_price}')
     kb_builder.adjust(2)
     return kb_builder.as_markup(resize_keyboard=True)
 
@@ -246,3 +246,18 @@ def u_choose_serv(s_name, s_price, g_id):
     kb_builder.adjust(2)
     return kb_builder.as_markup(resize_keyboard=True)
 
+
+def u_webcam_req():
+    kb_builder = InlineKeyboardBuilder()
+    kb_builder.button(text='Да', callback_data=f'webcam_req_y_')
+    kb_builder.button(text='Нет', callback_data=f'webcam_req_n_')
+    kb_builder.adjust(2)
+    return kb_builder.as_markup(resize_keyboard=True)
+
+
+def additional_part_req():
+    kb_builder = InlineKeyboardBuilder()
+    kb_builder.button(text='Да', callback_data=f'add_part_req_y_')
+    kb_builder.button(text='Нет', callback_data=f'add_part_req_n_')
+    kb_builder.adjust(2)
+    return kb_builder.as_markup(resize_keyboard=True)
