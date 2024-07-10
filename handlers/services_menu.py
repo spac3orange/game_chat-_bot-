@@ -96,6 +96,8 @@ async def bg_add_serv(call: CallbackQuery, state: FSMContext):
             serv_str += f'\n{v["name"]}'
     total_price = sum(int(service['price']) for service in state_data.values())
     ttl_hours = serv_str.count('1 час')
+    ttl_hours += serv_str.count('1 Час')
+    ttl_hours += serv_str.count('1 ЧАС')
     print(ttl_hours)
     await call.message.edit_text(f'{g_data['data']}'
                                       f'\n\nСписок добавленных услуг: {serv_str}'
@@ -117,6 +119,8 @@ async def back_to_add_serv(call: CallbackQuery, state: FSMContext):
             serv_str += f'\n{v["name"]}'
     total_price = sum(int(service['price']) for service in state_data.values())
     ttl_hours = serv_str.count('1 час')
+    ttl_hours += serv_str.count('1 Час')
+    ttl_hours += serv_str.count('1 ЧАС')
     print(ttl_hours)
     g_services = await db.get_services_by_user_id(g_id)
     await call.message.edit_text(f'{g_data["data"]}'
