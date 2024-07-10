@@ -127,4 +127,4 @@ async def back_to_add_serv(call: CallbackQuery, state: FSMContext):
     await call.message.edit_text(f'{g_data["data"]}'
                                  f'\n\nСписок добавленных услуг: {serv_str}'
                                  f'\n\nОбщая стоимость доп. услуг: \n{total_price} рублей',
-                                 reply_markup=main_kb.create_add_services_keyboard(g_id, g_services, total_price, g_data['h_price']))
+                                 reply_markup=main_kb.create_add_services_keyboard(g_id, g_services, total_price, g_data['h_price'], ttl_hours))
