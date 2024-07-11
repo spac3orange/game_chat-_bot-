@@ -41,14 +41,17 @@ async def parse_media(path):
 
 async def send_chat_request(hours: str, message: Message | CallbackQuery, g_id: int,
                             state: FSMContext, uid: int, ):
+    schd = Scheduler()
     print(f'{hours=}')
     if int(hours) == 0:
-        timing = 30 * 60
+        timing = 1 * 3600
+        hours = 12
+        await schd.schedule_review(timing=timing, message=message, g_id=g_id)
     else:
         timing = int(hours) * 3600
-    schd = Scheduler()
+        await schd.schedule_review(timing=timing, message=message, g_id=g_id)
+
     print(f'schd timing {timing}')
-    await schd.schedule_review(timing=timing, message=message, g_id=g_id)
     # await state.update_data(self_id=uid)
     if isinstance(message, Message):
         await message.reply("Ожидайте подключения...")
