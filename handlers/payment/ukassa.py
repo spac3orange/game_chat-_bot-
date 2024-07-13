@@ -180,19 +180,18 @@ async def p_check_pay_status(call: CallbackQuery, state: FSMContext):
     username = call.from_user.username
     uid = call.from_user.id
     logger.info(f'{uid} checking payment status')
-    if len(call.data.split('_')) == 5:
-        g_id = None
-    else:
-        g_id = int(call.data.split('_')[-3])
-        hours = call.data.split('_')[-4]
-
-    pid = decode_payment_id_base64(call.data.split('_')[-2])
-    print(pid)
+    pid = call.data.split('_')[-2]
     amount = call.data.split('_')[-1]
     uid = call.from_user.id
     status = await check_payment_status(pid)
-    if status == 'CONFIRMED' and g_id is not None:
+    hours = 0
+    if status == 'succeeded':
         await db.top_up_balance(uid, int(amount))
+        if len(call.data.split('_')) == 5:
+            g_id = None
+        else:
+            g_id = int(call.data.split('_')[-3])
+            hours = call.data.split('_')[-4]
         u_balance = await db.get_user_balance(uid)
         await call.message.edit_text(f'\n<b>Платеж принят.</b>'
                                      f'\nЗачислено: <b>{amount}</b> рублей'
@@ -200,22 +199,13 @@ async def p_check_pay_status(call: CallbackQuery, state: FSMContext):
         adm_text = f'{username} пополнил баланс на {amount} рублей.'
         await inform_admins(adm_text)
         await db.withdraw_from_balance(uid, int(amount))
-        await send_chat_request(hours, call, g_id, state, uid)
-    elif status == 'CONFIRMED' and g_id is None:
-        await db.top_up_balance(uid, int(amount))
-        u_balance = await db.get_user_balance(uid)
-        await call.message.edit_text(f'\n<b>Платеж принят.</b>'
-                                     f'\nЗачислено: <b>{amount}</b> рублей'
-                                     f'\n<b>Баланс:</b> {u_balance} рублей')
-        adm_text = f'{username} пополнил баланс на {amount} рублей.'
-        await inform_admins(adm_text)
-    elif status == 'REJECTED':
-        await call.message.edit_text(f'\n<b>Платеж отменен.</b>'
-                                     f'\nНа вашей карте недостаточно средств.')
-        await state.clear()
-        return
+        girl_payment = (67 / 100) * int(amount)
+        logger.info(f'girl payment" {girl_payment}')
+        await db.top_up_girl_balance(int(g_id), int(girl_payment))
+        await send_chat_request(str(hours), call, g_id, state, uid)
     else:
         await call.message.answer('Платеж еще не обработан.')
+
 
 
 # @router.message(UkassaPayment.input_value, lambda message: message.text.isdigit() and int(message.text) >= 500)
@@ -255,7 +245,6 @@ async def pre_checkout_query(pre_checkout_query: PreCheckoutQuery, bot: aiogram_
 @router.message(F.content_type == ContentType.SUCCESSFUL_PAYMENT)
 async def successful_payment(message: Message, state: FSMContext):
     uid = message.from_user.id
-    print('successssfsdfdfsdsf')
     amount = message.successful_payment.total_amount // 100
     await message.answer(f'Баланс успешно пополнен на {amount} рублей.')
     logger.info(f'{uid} balance update: amount {amount}')
