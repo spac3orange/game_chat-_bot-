@@ -170,45 +170,47 @@ async def p_buy_ukassa(message: Message, bot: aiogram_bot, state: FSMContext):
 
 @router.callback_query(F.data.startswith('check_pay_status'))
 async def p_check_pay_status(call: CallbackQuery, state: FSMContext):
-    username = call.from_user.username
-    uid = call.from_user.id
-    logger.info(f'{uid} checking payment status')
-    if len(call.data.split('_')) == 5:
-        g_id = None
-    else:
-        g_id = int(call.data.split('_')[-3])
-        hours = call.data.split('_')[-4]
-
-    pid = call.data.split('_')[-2]
-    amount = call.data.split('_')[-1]
-    uid = call.from_user.id
-    status = await check_payment_status(pid)
-    if status == 'CONFIRMED' and g_id is not None:
-        await db.top_up_balance(uid, int(amount))
-        u_balance = await db.get_user_balance(uid)
-        await call.message.edit_text(f'\n<b>Платеж принят.</b>'
-                                     f'\nЗачислено: <b>{amount}</b> рублей'
-                                     f'\n<b>Баланс:</b> {u_balance} рублей')
-        adm_text = f'{username} пополнил баланс на {amount} рублей.'
-        await inform_admins(adm_text)
-        await db.withdraw_from_balance(uid, int(amount))
-        await send_chat_request(hours, call, g_id, state, uid)
-    elif status == 'CONFIRMED' and g_id is None:
-        await db.top_up_balance(uid, int(amount))
-        u_balance = await db.get_user_balance(uid)
-        await call.message.edit_text(f'\n<b>Платеж принят.</b>'
-                                     f'\nЗачислено: <b>{amount}</b> рублей'
-                                     f'\n<b>Баланс:</b> {u_balance} рублей')
-        adm_text = f'{username} пополнил баланс на {amount} рублей.'
-        await inform_admins(adm_text)
-    elif status == 'REJECTED':
-        await call.message.edit_text(f'\n<b>Платеж отменен.</b>'
-                                     f'\nНа вашей карте недостаточно средств.')
-        await state.clear()
-        return
-    else:
-        await call.message.answer('Платеж еще не обработан.')
-
+    await call.answer()
+    await call.message.answer('1')
+    # username = call.from_user.username
+    # uid = call.from_user.id
+    # logger.info(f'{uid} checking payment status')
+    # if len(call.data.split('_')) == 5:
+    #     g_id = None
+    # else:
+    #     g_id = int(call.data.split('_')[-3])
+    #     hours = call.data.split('_')[-4]
+    #
+    # pid = call.data.split('_')[-2]
+    # amount = call.data.split('_')[-1]
+    # uid = call.from_user.id
+    # status = await check_payment_status(pid)
+    # if status == 'CONFIRMED' and g_id is not None:
+    #     await db.top_up_balance(uid, int(amount))
+    #     u_balance = await db.get_user_balance(uid)
+    #     await call.message.edit_text(f'\n<b>Платеж принят.</b>'
+    #                                  f'\nЗачислено: <b>{amount}</b> рублей'
+    #                                  f'\n<b>Баланс:</b> {u_balance} рублей')
+    #     adm_text = f'{username} пополнил баланс на {amount} рублей.'
+    #     await inform_admins(adm_text)
+    #     await db.withdraw_from_balance(uid, int(amount))
+    #     await send_chat_request(hours, call, g_id, state, uid)
+    # elif status == 'CONFIRMED' and g_id is None:
+    #     await db.top_up_balance(uid, int(amount))
+    #     u_balance = await db.get_user_balance(uid)
+    #     await call.message.edit_text(f'\n<b>Платеж принят.</b>'
+    #                                  f'\nЗачислено: <b>{amount}</b> рублей'
+    #                                  f'\n<b>Баланс:</b> {u_balance} рублей')
+    #     adm_text = f'{username} пополнил баланс на {amount} рублей.'
+    #     await inform_admins(adm_text)
+    # elif status == 'REJECTED':
+    #     await call.message.edit_text(f'\n<b>Платеж отменен.</b>'
+    #                                  f'\nНа вашей карте недостаточно средств.')
+    #     await state.clear()
+    #     return
+    # else:
+    #     await call.message.answer('Платеж еще не обработан.')
+    #
 
 # @router.message(UkassaPayment.input_value, lambda message: message.text.isdigit() and int(message.text) >= 500)
 # async def p_buy_ukassa(message: Message, bot: aiogram_bot, state: FSMContext):

@@ -121,7 +121,7 @@ def pay_btns(pid, conf_url, amount):
 def pay_btns_fxd(pid, conf_url, amount, g_id, hours):
     kb_builder = InlineKeyboardBuilder()
     kb_builder.button(text='Оплатить', url=conf_url)
-    # kb_builder.button(text='Проверить статус', callback_data=f'check_pay_status_{hours}_{g_id}_{pid}_{amount}')
+    kb_builder.button(text='Проверить статус', callback_data=f'check_pay_status_{hours}_{g_id}_{pid}_{amount}')
 
     kb_builder.adjust(1)
     return kb_builder.as_markup(resize_keyboard=True)
