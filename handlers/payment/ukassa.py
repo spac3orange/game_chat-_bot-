@@ -18,6 +18,7 @@ from states import UkassaPayment
 from utils import inform_admins
 from ..search_engine import send_chat_request
 import uuid
+import base64
 
 router = Router()
 env = Env()
@@ -30,6 +31,11 @@ async def calculate_price_without_vat(price_with_vat, vat_rate):
     price_without_vat = price_with_vat / (1 + vat_rate)
     return price_without_vat
 
+def decode_payment_id_base64(encoded_id: str) -> str:
+    # Декодирование из Base64
+    decoded_id_bytes = base64.urlsafe_b64decode(encoded_id + '==')
+    decoded_payment_id = str(uuid.UUID(bytes=decoded_id_bytes))
+    return decoded_payment_id
 
 # Функция для создания платежа
 async def create_payment(amount, description, return_url=None):
@@ -172,45 +178,45 @@ async def p_buy_ukassa(message: Message, bot: aiogram_bot, state: FSMContext):
 async def p_check_pay_status(call: CallbackQuery, state: FSMContext):
     await call.answer()
     await call.message.answer('1')
-    # username = call.from_user.username
-    # uid = call.from_user.id
-    # logger.info(f'{uid} checking payment status')
-    # if len(call.data.split('_')) == 5:
-    #     g_id = None
-    # else:
-    #     g_id = int(call.data.split('_')[-3])
-    #     hours = call.data.split('_')[-4]
-    #
-    # pid = call.data.split('_')[-2]
-    # amount = call.data.split('_')[-1]
-    # uid = call.from_user.id
-    # status = await check_payment_status(pid)
-    # if status == 'CONFIRMED' and g_id is not None:
-    #     await db.top_up_balance(uid, int(amount))
-    #     u_balance = await db.get_user_balance(uid)
-    #     await call.message.edit_text(f'\n<b>Платеж принят.</b>'
-    #                                  f'\nЗачислено: <b>{amount}</b> рублей'
-    #                                  f'\n<b>Баланс:</b> {u_balance} рублей')
-    #     adm_text = f'{username} пополнил баланс на {amount} рублей.'
-    #     await inform_admins(adm_text)
-    #     await db.withdraw_from_balance(uid, int(amount))
-    #     await send_chat_request(hours, call, g_id, state, uid)
-    # elif status == 'CONFIRMED' and g_id is None:
-    #     await db.top_up_balance(uid, int(amount))
-    #     u_balance = await db.get_user_balance(uid)
-    #     await call.message.edit_text(f'\n<b>Платеж принят.</b>'
-    #                                  f'\nЗачислено: <b>{amount}</b> рублей'
-    #                                  f'\n<b>Баланс:</b> {u_balance} рублей')
-    #     adm_text = f'{username} пополнил баланс на {amount} рублей.'
-    #     await inform_admins(adm_text)
-    # elif status == 'REJECTED':
-    #     await call.message.edit_text(f'\n<b>Платеж отменен.</b>'
-    #                                  f'\nНа вашей карте недостаточно средств.')
-    #     await state.clear()
-    #     return
-    # else:
-    #     await call.message.answer('Платеж еще не обработан.')
-    #
+    username = call.from_user.username
+    uid = call.from_user.id
+    logger.info(f'{uid} checking payment status')
+    if len(call.data.split('_')) == 5:
+        g_id = None
+    else:
+        g_id = int(call.data.split('_')[-3])
+        hours = call.data.split('_')[-4]
+
+    pid = decode_payment_id_base64(call.data.split('_')[-2])
+    amount = call.data.split('_')[-1]
+    uid = call.from_user.id
+    status = await check_payment_status(pid)
+    if status == 'CONFIRMED' and g_id is not None:
+        await db.top_up_balance(uid, int(amount))
+        u_balance = await db.get_user_balance(uid)
+        await call.message.edit_text(f'\n<b>Платеж принят.</b>'
+                                     f'\nЗачислено: <b>{amount}</b> рублей'
+                                     f'\n<b>Баланс:</b> {u_balance} рублей')
+        adm_text = f'{username} пополнил баланс на {amount} рублей.'
+        await inform_admins(adm_text)
+        await db.withdraw_from_balance(uid, int(amount))
+        await send_chat_request(hours, call, g_id, state, uid)
+    elif status == 'CONFIRMED' and g_id is None:
+        await db.top_up_balance(uid, int(amount))
+        u_balance = await db.get_user_balance(uid)
+        await call.message.edit_text(f'\n<b>Платеж принят.</b>'
+                                     f'\nЗачислено: <b>{amount}</b> рублей'
+                                     f'\n<b>Баланс:</b> {u_balance} рублей')
+        adm_text = f'{username} пополнил баланс на {amount} рублей.'
+        await inform_admins(adm_text)
+    elif status == 'REJECTED':
+        await call.message.edit_text(f'\n<b>Платеж отменен.</b>'
+                                     f'\nНа вашей карте недостаточно средств.')
+        await state.clear()
+        return
+    else:
+        await call.message.answer('Платеж еще не обработан.')
+
 
 # @router.message(UkassaPayment.input_value, lambda message: message.text.isdigit() and int(message.text) >= 500)
 # async def p_buy_ukassa(message: Message, bot: aiogram_bot, state: FSMContext):
