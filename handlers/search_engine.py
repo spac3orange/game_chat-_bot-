@@ -511,8 +511,8 @@ async def p_buy(message: Message, state: FSMContext):
                              '\n<b>Приятной игры!</b>')
 
         adm_text = f'Пользователь {username} оплатил доступ к девушке {g_username}. Сумма: {ttl_price} руб.'
-        if uid != 46281319:
-            await inform_admins(adm_text)
+        # if uid != 46281319:
+        #     await inform_admins(adm_text)
         await state.clear()
         await send_chat_request(ttl_hours, message, g_id, state, uid)
 
@@ -599,8 +599,8 @@ async def p_alone_q_n(call: CallbackQuery, state: FSMContext):
                              '\n<b>Приятной игры!</b>')
 
         adm_text = f'Пользователь {username} оплатил доступ к девушке {g_username}. Сумма: {ttl_price} руб.'
-        if uid != 46281319:
-            await inform_admins(adm_text)
+        # if uid != 46281319:
+        #     await inform_admins(adm_text)
         await state.clear()
         await send_chat_request(ttl_hours, call, g_id, state, uid)
 
