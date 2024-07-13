@@ -7,6 +7,7 @@ from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, FSInputFile
+from aiogram.types.message import ContentType
 from aiogram.utils.media_group import MediaGroupBuilder
 import magic
 from config import logger, aiogram_bot
@@ -666,7 +667,7 @@ async def remaining_time_command(message: Message):
         await message.answer("Нет активного чата.")
 
 
-@router.message(ChatConnect.chatting)
+@router.message(ChatConnect.chatting, ContentType.ANY)
 async def handle_message(message: Message, state: FSMContext):
     data = await state.get_data()
     user_1_id, user_2_id = data['user_1'], data['user_2']
@@ -692,7 +693,20 @@ async def handle_message(message: Message, state: FSMContext):
         recipient_id = user_1_id
     rec_state = await db.check_user_state(recipient_id, ChatConnect.chatting)
     if rec_state:
-        await aiogram_bot.send_message(recipient_id, message.text)
+        if message.text:
+            await aiogram_bot.send_message(recipient_id, message.text)
+        elif message.photo:
+            await aiogram_bot.send_photo(recipient_id, message.photo[-1].file_id, caption=message.caption)
+        elif message.video:
+            await aiogram_bot.send_video(recipient_id, message.video.file_id, caption=message.caption)
+        elif message.document:
+            await aiogram_bot.send_document(recipient_id, message.document.file_id, caption=message.caption)
+        elif message.audio:
+            await aiogram_bot.send_audio(recipient_id, message.audio.file_id, caption=message.caption)
+        elif message.voice:
+            await aiogram_bot.send_voice(recipient_id, message.voice.file_id, caption=message.caption)
+        else:
+            await message.answer("Тип медиа не поддерживается.")
     else:
         await message.answer('Чат завершен.')
         await db.set_user_state(user_1_id, 'None')
