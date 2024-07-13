@@ -511,8 +511,7 @@ async def p_buy(message: Message, state: FSMContext):
                              '\n<b>Приятной игры!</b>')
 
         adm_text = f'Пользователь {username} оплатил доступ к девушке {g_username}. Сумма: {ttl_price} руб.'
-        # if uid != 46281319:
-        #     await inform_admins(adm_text)
+        await inform_admins(adm_text)
         await state.clear()
         await send_chat_request(ttl_hours, message, g_id, state, uid)
 
@@ -599,8 +598,7 @@ async def p_alone_q_n(call: CallbackQuery, state: FSMContext):
                              '\n<b>Приятной игры!</b>')
 
         adm_text = f'Пользователь {username} оплатил доступ к девушке {g_username}. Сумма: {ttl_price} руб.'
-        # if uid != 46281319:
-        #     await inform_admins(adm_text)
+        await inform_admins(adm_text)
         await state.clear()
         await send_chat_request(ttl_hours, call, g_id, state, uid)
 
@@ -634,13 +632,15 @@ async def p_acc_chat(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text("Вы приняли заявку на чат."
                                      "\n\n<b>Управление чатом:</b> "
                                      "\n<b>Проверить оставшееся время чата:</b> /remaining_time"
-                                     "\n<b>Остановить чат:</b> /stop_chat", reply_markup=None)
+                                     "\n<b>Остановить чат:</b> /stop_chat"
+                                     "\n\n<b>ВНИМАНИЕ!</b> Во время чата запрещено использовать какие либо команды, кроме команд выше. Это может привести к завершению чата.", reply_markup=None)
     await callback.message.answer('Перейдите на "ссылка дискорда", займите свободную комнату, дождитесь заказчика и переместите его из лобби ожидания')
     await aiogram_bot.send_message(user_1_id, "Пользователь принял вашу заявку. Чат запущен."
                                               "\nВам был начислен бонус: 10 минут чата."
                                               "\n\n<b>Управление чатом:</b> "
                                               "\n<b>Проверить оставшееся время чата:</b> /remaining_time"
-                                              "\n<b>Остановить чат:</b> /stop_chat")
+                                              "\n<b>Остановить чат:</b> /stop_chat"
+                                              "\n\n<b>ВНИМАНИЕ!</b> Во время чата запрещено использовать какие либо команды, кроме команд выше. Это может привести к завершению чата.")
     await aiogram_bot.send_message(user_1_id, 'Перейдите на "ссылка дискорда", зайдите в Waiting Room, сообщите девушке свой никнейм в Telegram чате')
     await state.set_state(ChatConnect.chatting)
     await state.update_data(user_1=user_1_id, user_2=user_2_id)
