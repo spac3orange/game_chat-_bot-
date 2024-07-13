@@ -180,7 +180,7 @@ async def p_check_pay_status(call: CallbackQuery, state: FSMContext):
     username = call.from_user.username
     uid = call.from_user.id
     logger.info(f'{uid} checking payment status')
-    pid = call.data.split('_')[-2]
+    pid = decode_payment_id_base64(call.data.split('_')[-2])
     amount = call.data.split('_')[-1]
     uid = call.from_user.id
     status = await check_payment_status(pid)
