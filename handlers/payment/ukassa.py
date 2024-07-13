@@ -177,7 +177,6 @@ async def p_buy_ukassa(message: Message, bot: aiogram_bot, state: FSMContext):
 @router.callback_query(F.data.startswith('check_pay_status'))
 async def p_check_pay_status(call: CallbackQuery, state: FSMContext):
     await call.answer()
-    await call.message.answer('1')
     username = call.from_user.username
     uid = call.from_user.id
     logger.info(f'{uid} checking payment status')
