@@ -98,7 +98,6 @@ async def bg_add_serv(call: CallbackQuery, state: FSMContext):
     ttl_hours = serv_str.count('1 час')
     ttl_hours += serv_str.count('1 Час')
     ttl_hours += serv_str.count('1 ЧАС')
-    print(123)
     print(ttl_hours)
     await call.message.edit_text(f'{g_data['data']}'
                                       f'\n\nСписок добавленных услуг: {serv_str}'
