@@ -26,7 +26,7 @@ class CheckSubMiddleware(BaseMiddleware):
             chat_member = await self.bot.get_chat_member(chat_id=self.channel_id, user_id=user_id)
             if chat_member.status not in ['creator', 'administrator', 'member']:
                 # Если пользователь не является участником канала, отправляем сообщение и прерываем обработку
-                await aiogram_bot.send_message(user_id, text="Вы должны быть участником нашего <a href='@ru_emarket'>канала</a> для доступа к боту."
+                await aiogram_bot.send_message(user_id, text="Вы должны быть участником нашего <a href='@egirlforyou'>канала</a> для доступа к боту."
                                                "\n\nПожалуйста, подпишитесь на канал и попробуйте еще раз.",
                                                reply_markup=main_kb.sub_menu())
                 return
