@@ -669,49 +669,53 @@ async def remaining_time_command(message: Message):
 
 @router.message(ChatConnect.chatting, lambda message: message.content_type in [ContentType.PHOTO, ContentType.VIDEO, ContentType.TEXT, ContentType.VOICE])
 async def handle_message(message: Message, state: FSMContext):
-    data = await state.get_data()
-    user_1_id, user_2_id = data['user_1'], data['user_2']
-    match message.text:
-        case '/stop_chat':
+    try:
+        data = await state.get_data()
+        user_1_id, user_2_id = data['user_1'], data['user_2']
+        match message.text:
+            case '/stop_chat':
+                await message.answer('Чат завершен.')
+                await db.set_user_state(user_1_id, 'None')
+                await db.set_user_state(user_2_id, 'None')
+                if user_1_id in timers:
+                    del timers[user_1_id]
+                if user_2_id in timers:
+                    del timers[user_2_id]
+                await state.clear()
+                return
+            case '/remaining_time':
+                await remaining_time_command(message)
+            case '/cancel_timer':
+                await cancel_timer_command(message)
+
+        if message.from_user.id == user_1_id:
+            recipient_id = user_2_id
+        else:
+            recipient_id = user_1_id
+        rec_state = await db.check_user_state(recipient_id, ChatConnect.chatting)
+        if rec_state:
+            if message.text:
+                await aiogram_bot.send_message(recipient_id, message.text)
+                logger.info(f'message: {message.text}')
+            elif message.photo:
+                await aiogram_bot.send_photo(recipient_id, message.photo[-1].file_id, caption=message.caption)
+            elif message.video:
+                await aiogram_bot.send_video(recipient_id, message.video.file_id, caption=message.caption)
+            elif message.document:
+                await aiogram_bot.send_document(recipient_id, message.document.file_id, caption=message.caption)
+            elif message.audio:
+                await aiogram_bot.send_audio(recipient_id, message.audio.file_id, caption=message.caption)
+            elif message.voice:
+                await aiogram_bot.send_voice(recipient_id, message.voice.file_id, caption=message.caption)
+            else:
+                await message.answer("Тип медиа не поддерживается.")
+        else:
             await message.answer('Чат завершен.')
             await db.set_user_state(user_1_id, 'None')
             await db.set_user_state(user_2_id, 'None')
-            if user_1_id in timers:
-                del timers[user_1_id]
-            if user_2_id in timers:
-                del timers[user_2_id]
             await state.clear()
-            return
-        case '/remaining_time':
-            await remaining_time_command(message)
-        case '/cancel_timer':
-            await cancel_timer_command(message)
-
-    if message.from_user.id == user_1_id:
-        recipient_id = user_2_id
-    else:
-        recipient_id = user_1_id
-    rec_state = await db.check_user_state(recipient_id, ChatConnect.chatting)
-    if rec_state:
-        if message.text:
-            await aiogram_bot.send_message(recipient_id, message.text)
-        elif message.photo:
-            await aiogram_bot.send_photo(recipient_id, message.photo[-1].file_id, caption=message.caption)
-        elif message.video:
-            await aiogram_bot.send_video(recipient_id, message.video.file_id, caption=message.caption)
-        elif message.document:
-            await aiogram_bot.send_document(recipient_id, message.document.file_id, caption=message.caption)
-        elif message.audio:
-            await aiogram_bot.send_audio(recipient_id, message.audio.file_id, caption=message.caption)
-        elif message.voice:
-            await aiogram_bot.send_voice(recipient_id, message.voice.file_id, caption=message.caption)
-        else:
-            await message.answer("Тип медиа не поддерживается.")
-    else:
-        await message.answer('Чат завершен.')
-        await db.set_user_state(user_1_id, 'None')
-        await db.set_user_state(user_2_id, 'None')
-        await state.clear()
+    except Exception as e:
+        logger.error(e)
 
 
 @router.message(Command('stop_chat'))
