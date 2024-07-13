@@ -667,7 +667,7 @@ async def remaining_time_command(message: Message):
         await message.answer("Нет активного чата.")
 
 
-@router.message(ChatConnect.chatting, ContentType.ANY)
+@router.message(ChatConnect.chatting, F.content_type == ContentType.ANY)
 async def handle_message(message: Message, state: FSMContext):
     data = await state.get_data()
     user_1_id, user_2_id = data['user_1'], data['user_2']
