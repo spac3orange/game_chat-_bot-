@@ -489,6 +489,8 @@ async def p_buy(message: Message, state: FSMContext):
         ttl_price = g_price + int(serv_price) + ttl_ppl_price
     user_balance = await db.get_user_balance(uid)
     if user_balance < ttl_price:
+        print('FINAL')
+        print(g_id, ttl_price, ttl_hours)
         await message.answer('На вашем балансе <b>недостаточно средств</b>.'
                              f'\n<b>Баланс: </b> {user_balance} руб.'
                              f'\n<b>Общая стоимость: </b> {ttl_price} руб.',
@@ -575,6 +577,8 @@ async def p_alone_q_n(call: CallbackQuery, state: FSMContext):
     print(user_balance)
     print('ttl_price', ttl_price)
     if user_balance < ttl_price:
+        print('FINAL')
+        print(g_id, ttl_price, ttl_hours)
         await call.message.edit_text('На вашем балансе <b>недостаточно средств</b>.'
                              f'\n<b>Баланс: </b> {user_balance} руб.'
                              f'\n<b>Общая стоимость: </b> {ttl_price} руб.',
