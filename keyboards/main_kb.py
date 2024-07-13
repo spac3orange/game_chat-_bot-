@@ -2,6 +2,23 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from config import config_aiogram
 from environs import Env
+import uuid
+import base64
+
+
+def encode_payment_id_base64(payment_id: str) -> str:
+    # Преобразование UUID в байты
+    payment_id_bytes = uuid.UUID(payment_id).bytes
+    # Кодирование в Base64
+    encoded_id = base64.urlsafe_b64encode(payment_id_bytes).decode('utf-8').rstrip('=')
+    return encoded_id
+
+
+def decode_payment_id_base64(encoded_id: str) -> str:
+    # Декодирование из Base64
+    decoded_id_bytes = base64.urlsafe_b64decode(encoded_id + '==')
+    decoded_payment_id = str(uuid.UUID(bytes=decoded_id_bytes))
+    return decoded_payment_id
 
 
 def start_btns(uid):
@@ -120,8 +137,9 @@ def pay_btns(pid, conf_url, amount):
 
 def pay_btns_fxd(pid, conf_url, amount, g_id, hours):
     kb_builder = InlineKeyboardBuilder()
+    encoded_id = encode_payment_id_base64(pid)
     kb_builder.button(text='Оплатить', url=conf_url)
-    kb_builder.button(text='Проверить статус', callback_data=f'check_pay_status_{hours}_{g_id}_{amount}')
+    kb_builder.button(text='Проверить статус', callback_data=f'check_pay_status_{hours}_{g_id}_{encoded_id}_{amount}')
 
     kb_builder.adjust(1)
     return kb_builder.as_markup(resize_keyboard=True)
