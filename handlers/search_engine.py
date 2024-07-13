@@ -634,14 +634,14 @@ async def p_acc_chat(callback: CallbackQuery, state: FSMContext):
                                      "\n<b>Проверить оставшееся время чата:</b> /remaining_time"
                                      "\n<b>Остановить чат:</b> /stop_chat"
                                      "\n\n<b>ВНИМАНИЕ!</b> Во время чата запрещено использовать какие либо команды, кроме команд выше. Это может привести к завершению чата.", reply_markup=None)
-    await callback.message.answer('Перейдите на "ссылка дискорда", займите свободную комнату, дождитесь заказчика и переместите его из лобби ожидания')
+    await callback.message.answer('Перейдите на <a href="https://discord.gg/6UfzQmGzmV">Discord сервер</a>, займите свободную комнату, дождитесь заказчика и переместите его из лобби ожидания')
     await aiogram_bot.send_message(user_1_id, "Пользователь принял вашу заявку. Чат запущен."
                                               "\nВам был начислен бонус: 10 минут чата."
                                               "\n\n<b>Управление чатом:</b> "
                                               "\n<b>Проверить оставшееся время чата:</b> /remaining_time"
                                               "\n<b>Остановить чат:</b> /stop_chat"
                                               "\n\n<b>ВНИМАНИЕ!</b> Во время чата запрещено использовать какие либо команды, кроме команд выше. Это может привести к завершению чата.")
-    await aiogram_bot.send_message(user_1_id, 'Перейдите на "ссылка дискорда", зайдите в Waiting Room, сообщите девушке свой никнейм в Telegram чате')
+    await aiogram_bot.send_message(user_1_id, 'Перейдите на <a href="https://discord.gg/6UfzQmGzmV">Discord сервер</a>, зайдите в Waiting Room, сообщите девушке свой никнейм в Telegram чате')
     await state.set_state(ChatConnect.chatting)
     await state.update_data(user_1=user_1_id, user_2=user_2_id)
     await db.set_user_state(user_2_id, state=await state.get_state())
