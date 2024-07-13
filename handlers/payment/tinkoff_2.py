@@ -4,20 +4,19 @@ import json
 import random
 import string
 from datetime import datetime, timedelta
-import asyncio
+
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, PreCheckoutQuery, CallbackQuery
 from aiogram.types.message import ContentType
 from environs import Env
-from yookassa import Configuration, Payment
+
 from config import aiogram_bot, logger
 from database import db
 from keyboards import main_kb
 from states import UkassaPayment
 from utils import inform_admins
 from ..search_engine import send_chat_request
-import uuid
 
 router = Router()
 env = Env()
@@ -34,68 +33,119 @@ async def calculate_price_without_vat(price_with_vat, vat_rate):
 # Функция для создания платежа
 async def create_payment(amount, description, return_url=None):
     try:
-        env = Env()
-        Configuration.account_id = env.int('uk_shop_id')
-        Configuration.secret_key = env.str('uk_api')
-        idempotence_key = str(uuid.uuid4())
-        print(Configuration.account_id)
-        print(Configuration.secret_key)
-
+        amount_rub = amount
+        amount = amount * 100
         return_url = 'https://t.me/Gifdeomes_bot'
-        price_wv = await calculate_price_without_vat(amount, 20)
-        payment = Payment.create({
-            "amount": {
-                "value": amount,
-                "currency": "RUB"
-            },
-            "confirmation": {
-                "type": "redirect",
-                "return_url": return_url
-            },
-            "description": f"{description}",
-            "capture": True,
-            "receipt": {
-                "customer": {
-                    "email": "stepusiktwitch@gmail.com"
-                },
-                "items": [
-                    {
-                        "description": "Пополнение баланса в Gifdeomes_bot",
-                        "quantity": 1,
-                        "amount": {
-                            "value": amount,
-                            "currency": "RUB"
-                        },
-                        "vat_code": "1"}
-                ]
-            },
-        }, idempotence_key)
+        invoice_number = ''.join(random.choices(string.digits, k=15))
+        due_date = (datetime.now() + timedelta(hours=6)).strftime('%Y-%m-%d')
+        invoice_date = datetime.now().strftime('%Y-%m-%d')
 
-        payment_status = payment.status
-        receipt_status = payment.receipt_registration
-        print(f'status: {payment_status}')
-        print(f'receipt_reg: {receipt_status}')
-        await asyncio.sleep(3)
-        conf_url = payment.confirmation.confirmation_url
-        return payment.id, conf_url, amount
+        # Корневые параметры для токена
+        params = {
+            "TerminalKey": terminal_key,
+            "Amount": amount,  # Сумма в копейках
+            "OrderId": invoice_number,
+            "Description": f"Пополнение баланса на {amount_rub} рублей",
+            "Password": t_password
+        }
+
+        # Сортируем параметры по ключу и конкатенируем их значения
+        sorted_values = ''.join(str(params[k]) for k in sorted(params.keys()))
+
+        # Вычисляем SHA-256 хеш
+        token = hashlib.sha256(sorted_values.encode('utf-8')).hexdigest()
+
+        conn = http.client.HTTPSConnection("securepay.tinkoff.ru")
+        payload = json.dumps({
+            "TerminalKey": terminal_key,
+            "Amount": amount,
+            "OrderId": invoice_number,
+            "Description": f"Пополнение баланса на {amount_rub} рублей",
+            "Token": token,
+
+            "Receipt": {
+                "Email": "stepdronpro@gmail.com",
+                "Phone": "+79031234555",
+                "Taxation": "osn",
+                "Items": [
+                    {
+                        "Name": f"Пополнение баланса на {amount_rub} рублей",
+                        "Price": amount,
+                        "Quantity": 1,
+                        "Amount": amount,
+                        "Tax": "vat10",
+                    }
+                ]
+            }
+        })
+
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': f'Bearer {t_token}'
+        }
+        conn.request("POST", "/v2/Init", payload, headers)
+        res = conn.getresponse()
+        data = res.read()
+        print(data.decode("utf-8"))
+        # Декодируем байты и парсим JSON
+        response_json = json.loads(data.decode("utf-8"))
+        payment_id = response_json.get('PaymentId')
+        payment_url = response_json.get('PaymentURL')
+        print(f'Payment ID: {payment_id}')
+        return payment_id, payment_url, amount_rub
+
     except Exception as e:
         print(e)
         logger.error("Произошла ошибка:", e)
-        return None
 
 
 # Функция для проверки статуса платежа
 async def check_payment_status(payment_id):
     try:
-        payment = Payment.find_one(payment_id)
-        status = payment.status
-        rec_status = payment.receipt_registration
-        print(f'status: {status}')
-        print(f'rec status: {rec_status}')
-        return status
+        params = {
+            "TerminalKey": terminal_key,
+            "PaymentId": payment_id,
+            "Password": t_password
+        }
+
+        # Сортируем параметры по ключу и конкатенируем их значения
+        sorted_values = ''.join(str(params[k]) for k in sorted(params.keys()))
+        token = hashlib.sha256(sorted_values.encode('utf-8')).hexdigest()
+        conn = http.client.HTTPSConnection("securepay.tinkoff.ru")
+        payload = json.dumps({
+            "TerminalKey": terminal_key,
+            "PaymentId": payment_id,
+            "Token": token,
+        })
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        }
+        conn.request("POST", "/v2/GetState", payload, headers)
+        res = conn.getresponse()
+        data = res.read()
+        print(data.decode("utf-8"))
+        # Декодируем байты и парсим JSON
+        response_json = json.loads(data.decode("utf-8"))
+        pay_status = response_json.get('Status')
+        print(f'Payment status: {pay_status}')
+        return pay_status
     except Exception as e:
         print("Произошла ошибка:", e)
         return None
+
+    # try:
+    #     payment = Payment.find_one(payment_id)
+    #     status = payment.status
+    #     rec_status = payment.receipt_registration
+    #     print(f'status: {status}')
+    #     print(f'rec status: {rec_status}')
+    #     return status
+    # except Exception as e:
+    #     print("Произошла ошибка:", e)
+    #     return None
+
 
 # Пример использования
 

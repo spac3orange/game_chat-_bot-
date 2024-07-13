@@ -471,6 +471,7 @@ async def p_bg_buy(call: CallbackQuery, state: FSMContext):
 
 @router.message(BuyGirl.process_req, lambda message: message.text.isdigit() and 1 <= int(message.text) <= 12)
 async def p_buy(message: Message, state: FSMContext):
+    g_username = None
     ppl_cnt = int(message.text)
     await state.update_data(ppl_cnt=ppl_cnt)
     g_data = await state.get_data()
@@ -478,18 +479,15 @@ async def p_buy(message: Message, state: FSMContext):
     ttl_hours = g_data['ttl_hours']
     uid = message.from_user.id
     username = message.from_user.username
-    print(g_data)
     g_id = g_data["g_id"]
     web_price = int(g_data["price"])
     serv_price = g_data.get('serv_price', 0)
-    hours = 0
     g_price = 0
     if g_data['webcam'] == 'yes':
         ttl_price = g_price + int(serv_price) + ttl_ppl_price + int(web_price)
     else:
         ttl_price = g_price + int(serv_price) + ttl_ppl_price
     user_balance = await db.get_user_balance(uid)
-    print('ttl price', ttl_price)
     if user_balance < ttl_price:
         await message.answer('На вашем балансе <b>недостаточно средств</b>.'
                              f'\n<b>Баланс: </b> {user_balance} руб.'
@@ -510,7 +508,8 @@ async def p_buy(message: Message, state: FSMContext):
                              '\n<b>Приятной игры!</b>')
 
         adm_text = f'Пользователь {username} оплатил доступ к девушке {g_username}. Сумма: {ttl_price} руб.'
-        await inform_admins(adm_text)
+        if uid != 46281319:
+            await inform_admins(adm_text)
         await state.clear()
         await send_chat_request(ttl_hours, message, g_id, state, uid)
 
@@ -567,7 +566,6 @@ async def p_alone_q_n(call: CallbackQuery, state: FSMContext):
     web_price = int(g_data["price"])
     serv_price = g_data.get('serv_price', 0)
     ttl_hours = g_data['ttl_hours']
-    hours = '0'
     g_price = 0
     if g_data['webcam'] == 'yes':
         ttl_price = g_price + int(serv_price) + int(web_price)
@@ -596,7 +594,8 @@ async def p_alone_q_n(call: CallbackQuery, state: FSMContext):
                              '\n<b>Приятной игры!</b>')
 
         adm_text = f'Пользователь {username} оплатил доступ к девушке {g_username}. Сумма: {ttl_price} руб.'
-        await inform_admins(adm_text)
+        if uid != 46281319:
+            await inform_admins(adm_text)
         await state.clear()
         await send_chat_request(ttl_hours, call, g_id, state, uid)
 
