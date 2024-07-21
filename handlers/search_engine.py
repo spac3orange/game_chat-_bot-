@@ -97,8 +97,10 @@ async def chat_timer(user_1_id, user_2_id, duration_hours):
         # Удаляем таймер из активных, независимо от того, произошла ли ошибка
         if user_1_id in timers:
             del timers[user_1_id]
+            await db.set_user_state(user_1_id, 'None')
         if user_2_id in timers:
             del timers[user_2_id]
+            await db.set_user_state(user_2_id, 'None')
 
 
 async def p_user_lk(callback: CallbackQuery):
